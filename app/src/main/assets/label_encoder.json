@@ -1,0 +1,19 @@
+{
+    "0": "affirm",
+    "1": "ask_capability",
+    "2": "ask_date_time",
+    "3": "ask_health_advice",
+    "4": "ask_medicine_info",
+    "5": "ask_repeat",
+    "6": "book_doctor_appointment",
+    "7": "cancel_task",
+    "8": "check_schedule",
+    "9": "deny",
+    "10": "goodbye",
+    "11": "greet",
+    "12": "report_symptoms",
+    "13": "request_emergency_help",
+    "14": "set_medication_reminder",
+    "15": "smalltalk_general",
+    "16": "thank_you"
+}
