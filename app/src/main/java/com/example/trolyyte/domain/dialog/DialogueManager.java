@@ -1,4 +1,8 @@
 package com.example.trolyyte.domain.dialog;
 
-public class DialogueManager {
+import com.example.trolyyte.domain.model.NlpResult;
+
+public interface DialogueManager {
+
+    DialogueResult handle(NlpResult nlpResult, DialogContext context);
 }

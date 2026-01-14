@@ -1,4 +1,5 @@
 package com.example.trolyyte.domain.ai;
 
-public class TtsService {
+public interface TtsService {
+    void speak(String text);
 }

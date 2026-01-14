@@ -1,0 +1,8 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+<!-- Thêm padding để logo nhỏ lại -->
+<item
+    android:drawable="@drawable/logo"
+    android:width="48dp"
+    android:height="48dp"
+    android:gravity="center" />
+</layer-list>

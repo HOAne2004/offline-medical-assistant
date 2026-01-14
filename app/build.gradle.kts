@@ -5,7 +5,11 @@ plugins {
 android {
     namespace = "com.example.trolyyte"
     compileSdk = 36
-
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
     androidResources {
         noCompress += "tflite"  // Không nén file có đuôi .tflite
         noCompress += "json"    // (Tùy chọn) Không nén file json
@@ -18,6 +22,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        ndk {
+            // Thêm x86 và x86_64 để chạy được trên máy ảo
+            abiFilters.add("armeabi-v7a")
+            abiFilters.add("arm64-v8a")
+            abiFilters.add("x86")
+            abiFilters.add("x86_64")
+        }
     }
 
     buildTypes {
@@ -47,6 +58,10 @@ dependencies {
     // 1. TensorFlow Lite (Core)
     implementation("org.tensorflow:tensorflow-lite:2.16.1")
     implementation("org.tensorflow:tensorflow-lite-select-tf-ops:2.16.1")
-// 2. Gson (Để đọc file JSON tokenizer và label)
+    implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
+    // 2. Gson (Để đọc file JSON tokenizer và label)
     implementation("com.google.code.gson:gson:2.10.1")
+
+    // 3. Vosk Android & JNA
+    implementation("com.alphacephei:vosk-android:0.3.47")
 }

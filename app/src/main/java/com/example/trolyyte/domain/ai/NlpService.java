@@ -1,4 +1,8 @@
 package com.example.trolyyte.domain.ai;
 
-public class NlpService {
+import com.example.trolyyte.domain.model.NlpResult;
+
+public interface NlpService {
+
+    NlpResult processText(String text);
 }

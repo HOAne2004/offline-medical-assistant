@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light_blue_background"
+    tools:context=".presentation.home.HomeActivity">
+
+    <!-- Phần tiêu đề -->
+    <LinearLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/appTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ElderCare Assistant"
+            android:textSize="28sp"
+            android:textColor="@color/dark_blue"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/appSlogan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Trợ lý sức khỏe thân thiện"
+            android:textSize="18sp"
+            android:textColor="@color/medium_blue"/>
+    </LinearLayout>
+
+    <!-- Phần chào hỏi -->
+    <LinearLayout
+        android:id="@+id/greetingLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/headerLayout"
+        android:layout_marginTop="80dp"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:paddingHorizontal="40dp">
+
+        <TextView
+            android:id="@+id/greetingText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Xin chào bác, bác cảm thấy thế nào hôm nay?"
+            android:textSize="24sp"
+            android:textColor="@color/black"
+            android:gravity="center"
+            android:lineSpacingExtra="4dp"/>
+    </LinearLayout>
+
+    <!-- Hướng dẫn sử dụng -->
+    <TextView
+        android:id="@+id/instructionText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/greetingLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="60dp"
+        android:text="Nhấn nút micro để bắt đầu trò chuyện"
+        android:textSize="18sp"
+        android:textColor="@color/dark_gray"/>
+
+    <!-- Nút micro chính -->
+    <RelativeLayout
+        android:id="@+id/micButtonContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/instructionText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/micButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fabCustomSize="100dp"
+            app:maxImageSize="50dp"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/ic_mic"
+            app:backgroundTint="@color/primary_blue"
+            app:tint="@android:color/white"
+            android:contentDescription="Nút ghi âm"/>
+
+        <TextView
+            android:id="@+id/buttonLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/micButton"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:text="Nhấn để nói"
+            android:textSize="20sp"
+            android:textColor="@color/primary_blue"
+            android:textStyle="bold"/>
+    </RelativeLayout>
+</RelativeLayout>
