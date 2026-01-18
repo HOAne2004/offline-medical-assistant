@@ -1,4 +1,6 @@
 package com.example.trolyyte.presentation.profile;
 
-public interface ProfileUiEvent {
+public enum ProfileUiEvent {
+    LOAD_PROFILE,
+    REFRESH_PROFILE
 }
