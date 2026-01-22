@@ -1,6 +1,435 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="14dp"
+    android:background="#F6FAFF">
+
+    <!-- ================= HEADER: LỊCH UỐNG THUỐC + NÚT + ================= -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardHeader"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="22dp"
+        app:cardElevation="6dp"
+        app:strokeWidth="2dp"
+        app:strokeColor="#CDE0FF"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="18dp">
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Lịch uống thuốc"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="#2E55FF"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btnAdd"
+                android:layout_marginEnd="12dp"/>
+
+            <TextView
+                android:id="@+id/tvSubtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Quản lý nhắc nhở của bác"
+                android:textSize="15sp"
+                android:textColor="#5C6B8A"
+                app:layout_constraintStart_toStartOf="@id/tvTitle"
+                app:layout_constraintTop_toBottomOf="@id/tvTitle"
+                app:layout_constraintEnd_toEndOf="@id/tvTitle"
+                android:layout_marginTop="6dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAdd"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:text="+"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:padding="0dp"
+                android:insetLeft="0dp"
+                android:insetRight="0dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:cornerRadius="18dp"
+                android:backgroundTint="#2E55FF"
+                android:textColor="#FFFFFF"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+
+    <!-- ================= FORM THÊM NHẮC NHỞ ================= -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardAddForm"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        app:cardCornerRadius="26dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="2dp"
+        app:strokeColor="#CDE0FF"
+        android:backgroundTint="#EAF3FF"
+        app:layout_constraintTop_toBottomOf="@id/cardHeader"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="18dp">
+
+            <TextView
+                android:id="@+id/tvAddTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Thêm nhắc nhở mới"
+                android:textStyle="bold"
+                android:textSize="17sp"
+                android:textColor="#2E55FF"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <!-- Tên thuốc -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilMedicineName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                app:boxBackgroundMode="outline"
+                app:boxCornerRadiusTopStart="18dp"
+                app:boxCornerRadiusTopEnd="18dp"
+                app:boxCornerRadiusBottomStart="18dp"
+                app:boxCornerRadiusBottomEnd="18dp"
+                app:boxStrokeColor="#CDE0FF"
+                app:layout_constraintTop_toBottomOf="@id/tvAddTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtMedicineName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Tên thuốc"
+                    android:textColor="#1E2430"
+                    android:textSize="15sp"
+                    android:padding="14dp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Giờ uống -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:boxBackgroundMode="outline"
+                app:boxCornerRadiusTopStart="18dp"
+                app:boxCornerRadiusTopEnd="18dp"
+                app:boxCornerRadiusBottomStart="18dp"
+                app:boxCornerRadiusBottomEnd="18dp"
+                app:boxStrokeColor="#CDE0FF"
+                app:endIconMode="custom"
+                app:endIconDrawable="@android:drawable/ic_lock_idle_alarm"
+                app:endIconTint="#2E55FF"
+                app:layout_constraintTop_toBottomOf="@id/tilMedicineName"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="--:--"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:textColor="#1E2430"
+                    android:textSize="16sp"
+                    android:padding="14dp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Ghi chú -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilNote"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:boxBackgroundMode="outline"
+                app:boxCornerRadiusTopStart="18dp"
+                app:boxCornerRadiusTopEnd="18dp"
+                app:boxCornerRadiusBottomStart="18dp"
+                app:boxCornerRadiusBottomEnd="18dp"
+                app:boxStrokeColor="#CDE0FF"
+                app:layout_constraintTop_toBottomOf="@id/tilTime"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtNote"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Ghi chú"
+                    android:minLines="2"
+                    android:textColor="#1E2430"
+                    android:textSize="15sp"
+                    android:padding="14dp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Lưu nhắc nhở -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSaveReminder"
+                android:layout_width="0dp"
+                android:layout_height="54dp"
+                android:text="Lưu nhắc nhở"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="#2E55FF"
+                app:cornerRadius="20dp"
+                app:layout_constraintTop_toBottomOf="@id/tilNote"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+
+    <!-- ================= LIST NHẮC NHỞ (DEMO ITEM) ================= -->
+    <ScrollView
+        android:id="@+id/scrollList"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="14dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/cardAddForm"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:id="@+id/layoutReminderList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="10dp">
+
+            <!-- ===== ITEM 1: CHƯA UỐNG ===== -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="6dp"
+                app:strokeWidth="2dp"
+                app:strokeColor="#CDE0FF"
+                android:backgroundTint="#FFFFFF">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:id="@+id/imgClock1"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@android:drawable/ic_lock_idle_alarm"
+                        app:tint="#2E55FF"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"/>
+
+                    <TextView
+                        android:id="@+id/tvTime1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="08:00"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:textColor="#2E55FF"
+                        android:layout_marginStart="10dp"
+                        app:layout_constraintStart_toEndOf="@id/imgClock1"
+                        app:layout_constraintTop_toTopOf="@id/imgClock1"
+                        app:layout_constraintBottom_toBottomOf="@id/imgClock1"/>
+
+                    <!-- Sửa -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnEdit1"
+                        android:layout_width="46dp"
+                        android:layout_height="46dp"
+                        android:layout_marginEnd="10dp"
+                        android:text="✎"
+                        android:textSize="16sp"
+                        android:textColor="#2E55FF"
+                        app:cornerRadius="14dp"
+                        android:backgroundTint="#EAF1FF"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/btnDelete1"/>
+
+                    <!-- Hủy/Xóa -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnDelete1"
+                        android:layout_width="46dp"
+                        android:layout_height="46dp"
+                        android:text="🗑"
+                        android:textSize="16sp"
+                        android:textColor="#FF3B30"
+                        app:cornerRadius="14dp"
+                        android:backgroundTint="#FFE8E6"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <TextView
+                        android:id="@+id/tvMedicineName1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Paracetamol"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:textColor="#1E2430"
+                        android:layout_marginTop="10dp"
+                        app:layout_constraintTop_toBottomOf="@id/tvTime1"
+                        app:layout_constraintStart_toStartOf="@id/tvTime1"
+                        app:layout_constraintEnd_toStartOf="@id/btnEdit1"/>
+
+                    <TextView
+                        android:id="@+id/tvNote1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Sau khi ăn sáng"
+                        android:textSize="14sp"
+                        android:textColor="#5C6B8A"
+                        android:layout_marginTop="6dp"
+                        app:layout_constraintTop_toBottomOf="@id/tvMedicineName1"
+                        app:layout_constraintStart_toStartOf="@id/tvMedicineName1"
+                        app:layout_constraintEnd_toEndOf="@id/tvMedicineName1"/>
+
+                    <!-- Xác nhận -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnConfirmTaken1"
+                        android:layout_width="0dp"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="14dp"
+                        android:text="Bác đã uống thuốc này chưa?"
+                        android:textAllCaps="false"
+                        android:textSize="14sp"
+                        android:textColor="#2E55FF"
+                        android:backgroundTint="#EAF1FF"
+                        app:cornerRadius="16dp"
+                        app:layout_constraintTop_toBottomOf="@id/tvNote1"
+                        app:layout_constraintStart_toStartOf="@id/tvNote1"
+                        app:layout_constraintEnd_toEndOf="@id/btnDelete1"/>
+
+                    <TextView
+                        android:id="@+id/tvStatus1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Chưa uống"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="#FF3B30"
+                        android:layout_marginTop="10dp"
+                        app:layout_constraintTop_toBottomOf="@id/btnConfirmTaken1"
+                        app:layout_constraintStart_toStartOf="@id/btnConfirmTaken1"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <!-- ===== ITEM 2: ĐÃ UỐNG (DEMO) ===== -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="6dp"
+                app:strokeWidth="2dp"
+                app:strokeColor="#B8F0C8"
+                android:backgroundTint="#FFFFFF">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:id="@+id/imgClock2"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@android:drawable/ic_lock_idle_alarm"
+                        app:tint="#25B36A"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"/>
+
+                    <TextView
+                        android:id="@+id/tvTime2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="12:00"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:textColor="#25B36A"
+                        android:layout_marginStart="10dp"
+                        app:layout_constraintStart_toEndOf="@id/imgClock2"
+                        app:layout_constraintTop_toTopOf="@id/imgClock2"
+                        app:layout_constraintBottom_toBottomOf="@id/imgClock2"/>
+
+                    <!-- ĐÃ FIX: BỎ android:paintFlags -->
+                    <TextView
+                        android:id="@+id/tvMedicineName2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Vitamin C"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:textColor="#1E2430"
+                        android:layout_marginTop="10dp"
+                        app:layout_constraintTop_toBottomOf="@id/tvTime2"
+                        app:layout_constraintStart_toStartOf="@id/tvTime2"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <TextView
+                        android:id="@+id/tvNote2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Trước bữa trưa"
+                        android:textSize="14sp"
+                        android:textColor="#5C6B8A"
+                        android:layout_marginTop="6dp"
+                        app:layout_constraintTop_toBottomOf="@id/tvMedicineName2"
+                        app:layout_constraintStart_toStartOf="@id/tvMedicineName2"
+                        app:layout_constraintEnd_toEndOf="@id/tvMedicineName2"/>
+
+                    <TextView
+                        android:id="@+id/tvStatus2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Đã uống"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="#25B36A"
+                        android:layout_marginTop="10dp"
+                        app:layout_constraintTop_toBottomOf="@id/tvNote2"
+                        app:layout_constraintStart_toStartOf="@id/tvNote2"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
