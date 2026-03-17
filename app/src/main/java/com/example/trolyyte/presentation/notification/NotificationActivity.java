@@ -17,14 +17,19 @@ public class NotificationActivity extends AppCompatActivity {
         binding = ActivityNotificationBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Tạo dữ liệu mẫu
+        // 1. Tạo dữ liệu mẫu (Gán phút mặc định là 15)
         List<Medicine> list = new ArrayList<>();
-        list.add(new Medicine("08:00", "Paracetamol", 10));
+        list.add(new Medicine("08:00", "Paracetamol", 15));
         list.add(new Medicine("12:00", "Vitamin C", 15));
-        list.add(new Medicine("18:00", "Thuốc bổ", 20));
+        list.add(new Medicine("19:00", "Thuốc bổ", 15));
 
-        // Thiết lập danh sách cuộn
+        // 2. Thiết lập danh sách hiển thị
         binding.rvNotificationMedicines.setLayoutManager(new LinearLayoutManager(this));
-        binding.rvNotificationMedicines.setAdapter(new NotificationMedicineAdapter(list));
+
+        // Quan trọng: Vì RecyclerView nằm trong NestedScrollView nên cần tắt cuộn riêng
+        binding.rvNotificationMedicines.setNestedScrollingEnabled(false);
+
+        NotificationMedicineAdapter adapter = new NotificationMedicineAdapter(list);
+        binding.rvNotificationMedicines.setAdapter(adapter);
     }
 }

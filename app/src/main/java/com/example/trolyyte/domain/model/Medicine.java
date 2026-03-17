@@ -13,10 +13,20 @@ public class Medicine {
         this.isMuted = false;
     }
 
+    // --- THÊM CÁC HÀM NÀY VÀO ---
+
+    public int getRemindMinutes() {
+        return remindMinutes;
+    }
+
+    public void setRemindMinutes(int remindMinutes) {
+        this.remindMinutes = remindMinutes;
+    }
+
+    // ----------------------------
+
     public String getTime() { return time; }
     public String getName() { return name; }
-    public int getRemindMinutes() { return remindMinutes; }
-    public void setRemindMinutes(int remindMinutes) { this.remindMinutes = remindMinutes; }
     public boolean isMuted() { return isMuted; }
     public void setMuted(boolean muted) { isMuted = muted; }
 }
