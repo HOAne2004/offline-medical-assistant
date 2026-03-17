@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "com.example.trolyyte"
-    compileSdk = 36
+    compileSdk = 34
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -17,7 +17,7 @@ android {
     defaultConfig {
         applicationId = "com.example.trolyyte"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -33,6 +33,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        dataBinding = true
     }
 
     buildTypes {

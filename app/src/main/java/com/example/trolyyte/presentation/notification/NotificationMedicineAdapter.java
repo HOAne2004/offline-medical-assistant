@@ -20,7 +20,6 @@ public class NotificationMedicineAdapter extends RecyclerView.Adapter<Notificati
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Sử dụng View Binding để kết nối với item_medicine_card.xml
         ItemMedicineCardBinding binding = ItemMedicineCardBinding.inflate(
                 LayoutInflater.from(parent.getContext()), parent, false);
         return new ViewHolder(binding);
@@ -28,62 +27,56 @@ public class NotificationMedicineAdapter extends RecyclerView.Adapter<Notificati
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Medicine medicine = medicineList.get(position);
+        Medicine medicine = medicineList.get(holder.getBindingAdapterPosition());
         ItemMedicineCardBinding b = holder.binding;
 
-        // 1. Đổ dữ liệu vào các ID khớp với XML
+        // 1. Đổ dữ liệu vào các ID khớp hoàn toàn với item_medicine_card.xml
         b.tvMedicineInfo.setText(medicine.getTime() + " – " + medicine.getName());
         b.tvReminderStatus.setText("Nhắc trước " + medicine.getRemindMinutes() + " phút");
 
-        // 2. Xử lý logic Mờ (Mute) khi nhấn chuông
-        // b.getRoot() đại diện cho MaterialCardView ngoài cùng
+        // 2. Xử lý logic Mờ khi nhấn chuông
         b.getRoot().setAlpha(medicine.isMuted() ? 0.4f : 1.0f);
 
         // 3. Sự kiện bấm nút Chuông (cvBellContainer)
         b.cvBellContainer.setOnClickListener(v -> {
-            medicine.setMuted(!medicine.isMuted());
-            notifyItemChanged(position); // Cập nhật lại giao diện hàng này
+            int currentPos = holder.getBindingAdapterPosition();
+            if (currentPos != RecyclerView.NO_POSITION) {
+                medicine.setMuted(!medicine.isMuted());
+                notifyItemChanged(currentPos);
+            }
         });
 
         // 4. Xử lý Highlight các nút thời gian (btn10m, btn15m, btn20m)
         updateTimerButtonsUI(b, medicine.getRemindMinutes());
 
-        b.btn10m.setOnClickListener(v -> {
-            medicine.setRemindMinutes(10);
-            notifyItemChanged(position);
-        });
+        b.btn10m.setOnClickListener(v -> updateMinutes(holder, medicine, 10));
+        b.btn15m.setOnClickListener(v -> updateMinutes(holder, medicine, 15));
+        b.btn20m.setOnClickListener(v -> updateMinutes(holder, medicine, 20));
+    }
 
-        b.btn15m.setOnClickListener(v -> {
-            medicine.setRemindMinutes(15);
-            notifyItemChanged(position);
-        });
-
-        b.btn20m.setOnClickListener(v -> {
-            medicine.setRemindMinutes(20);
-            notifyItemChanged(position);
-        });
+    private void updateMinutes(ViewHolder holder, Medicine medicine, int minutes) {
+        int currentPos = holder.getBindingAdapterPosition();
+        if (currentPos != RecyclerView.NO_POSITION) {
+            medicine.setRemindMinutes(minutes);
+            notifyItemChanged(currentPos);
+        }
     }
 
     private void updateTimerButtonsUI(ItemMedicineCardBinding b, int selectedMinutes) {
-        // Cập nhật background dựa trên thời gian đang chọn
-        // Lưu ý: Bạn nên sử dụng các drawable đã tạo (bg_option_selected / bg_option_unselected)
-
-        b.btn10m.setBackgroundResource(selectedMinutes == 10 ?
-                R.drawable.bg_option_selected : R.drawable.bg_option_unselected);
+        // Cập nhật background và màu chữ dựa trên phút được chọn
+        b.btn10m.setBackgroundResource(selectedMinutes == 10 ? R.drawable.bg_option_selected : R.drawable.bg_option_unselected);
         b.btn10m.setTextColor(selectedMinutes == 10 ? 0xFFFFFFFF : 0xFF3366FF);
 
-        b.btn15m.setBackgroundResource(selectedMinutes == 15 ?
-                R.drawable.bg_option_selected : R.drawable.bg_option_unselected);
+        b.btn15m.setBackgroundResource(selectedMinutes == 15 ? R.drawable.bg_option_selected : R.drawable.bg_option_unselected);
         b.btn15m.setTextColor(selectedMinutes == 15 ? 0xFFFFFFFF : 0xFF3366FF);
 
-        b.btn20m.setBackgroundResource(selectedMinutes == 20 ?
-                R.drawable.bg_option_selected : R.drawable.bg_option_unselected);
+        b.btn20m.setBackgroundResource(selectedMinutes == 20 ? R.drawable.bg_option_selected : R.drawable.bg_option_unselected);
         b.btn20m.setTextColor(selectedMinutes == 20 ? 0xFFFFFFFF : 0xFF3366FF);
     }
 
     @Override
     public int getItemCount() {
-        return medicineList.size();
+        return medicineList != null ? medicineList.size() : 0;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
