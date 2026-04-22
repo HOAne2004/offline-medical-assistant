@@ -35,21 +35,21 @@ public class HomeViewModel extends ViewModel {
     private final MutableLiveData<HomeUiState> uiState = new MutableLiveData<>(new HomeUiState.Idle());
     public LiveData<HomeUiState> getUiState() { return uiState; }
 
-    public HomeViewModel(
-            ListenVoiceUseCase listenVoiceUseCase,
-            ProcessTextUseCase processTextUseCase,
-            HandleDialogueUseCase handleDialogueUseCase,
-            SpeakResponseUseCase speakResponseUseCase,
-            TtsRepository ttsRepository,
-            ResponseTextProvider responseTextProvider
-    ) {
-        this.listenVoiceUseCase = listenVoiceUseCase;
-        this.processTextUseCase = processTextUseCase;
-        this.handleDialogueUseCase = handleDialogueUseCase;
-        this.speakResponseUseCase = speakResponseUseCase; // UseCase này sẽ dùng ở bước sau
-        this.ttsRepository = ttsRepository;
-        this.responseTextProvider = responseTextProvider;
-    }
+        public HomeViewModel(
+                ListenVoiceUseCase listenVoiceUseCase,
+                ProcessTextUseCase processTextUseCase,
+                HandleDialogueUseCase handleDialogueUseCase,
+                SpeakResponseUseCase speakResponseUseCase,
+                TtsRepository ttsRepository,
+                ResponseTextProvider responseTextProvider
+        ) {
+            this.listenVoiceUseCase = listenVoiceUseCase;
+            this.processTextUseCase = processTextUseCase;
+            this.handleDialogueUseCase = handleDialogueUseCase;
+            this.speakResponseUseCase = speakResponseUseCase; // UseCase này sẽ dùng ở bước sau
+            this.ttsRepository = ttsRepository;
+            this.responseTextProvider = responseTextProvider;
+        }
 
     // =================================================================================
     // 1. LISTEN VOICE (Nghe & Nhận dạng)

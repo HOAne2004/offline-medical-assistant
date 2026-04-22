@@ -9,7 +9,6 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
@@ -17,6 +16,10 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.trolyyte.MedicalAssistantApplication;
 import com.example.trolyyte.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import android.view.View; // Để hết lỗi đỏ chữ View
+import com.example.trolyyte.data.tts.TextToSpeechHelper; // Import từ tầng data
+
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -27,6 +30,7 @@ public class HomeActivity extends AppCompatActivity {
     private TextView instructionText;
     private FloatingActionButton micButton;
     private TextView buttonLabel;
+    private TextToSpeechHelper ttsHelper;
 
     // Permission Launcher
     private final ActivityResultLauncher<String> requestPermissionLauncher =
@@ -46,6 +50,27 @@ public class HomeActivity extends AppCompatActivity {
         setupDependencies();
         setupViews();
         observeUiState();
+
+        ttsHelper = new TextToSpeechHelper(this);
+
+        // 2. GÁN SỰ KIỆN CHO NÚT MIC (Thay thế đoạn setOnClickListener cũ)
+        micButton.setOnClickListener(v -> {
+            // Test phát giọng nói (Nhiệm vụ tuần 1)
+            if (ttsHelper != null) {
+                ttsHelper.speak("Chào ông bà, con đã sẵn sàng.");
+            }
+
+            // Gọi logic xin quyền và bắt đầu nghe (Nhiệm vụ tuần 1)
+            checkPermissionAndStart();
+
+            Toast.makeText(this, "Đang kiểm tra quyền và phát tiếng...", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ttsHelper.onDestroy(); // Nhớ đóng loa khi thoát app cho đỡ tốn pin
     }
 
     private void setupDependencies() {
