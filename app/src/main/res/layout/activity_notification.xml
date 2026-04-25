@@ -107,6 +107,6 @@
             android:nestedScrollingEnabled="false"
             android:overScrollMode="never"
             tools:listitem="@layout/item_medicine_card" />
-
     </LinearLayout>
+
 </androidx.core.widget.NestedScrollView>
