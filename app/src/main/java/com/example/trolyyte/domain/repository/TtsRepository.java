@@ -16,4 +16,6 @@ public interface TtsRepository {
         void onDone();      // Khi nói xong
         void onError();     // Khi lỗi
     }
+    // Thêm hàm này để TV4 biết đường cài đặt tốc độ đọc cho chị Google
+    void setSpeed(float speed);
 }

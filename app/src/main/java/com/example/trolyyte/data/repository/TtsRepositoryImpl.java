@@ -43,4 +43,9 @@ public class TtsRepositoryImpl implements TtsRepository {
     public void release() {
         ttsEngine.shutdown();
     }
+
+    @Override
+    public void setSpeed(float speed) {
+        ttsEngine.setSpeechRate(speed);
+    }
 }
