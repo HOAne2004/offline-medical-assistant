@@ -9,21 +9,9 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/nav_health"
-        android:icon="@drawable/ic_health"
-        android:title="Sức khỏe"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/nav_chat"
-        android:icon="@drawable/ic_chat"
-        android:title="Trò chuyện"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/nav_medicine"
-        android:icon="@drawable/ic_medicine"
-        android:title="Thuốc men"
+        android:id="@+id/nav_reminders"
+        android:icon="@drawable/ic_calendar"
+        android:title="Đặt lịch"
         app:showAsAction="ifRoom" />
 
     <item

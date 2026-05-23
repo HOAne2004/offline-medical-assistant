@@ -2,6 +2,11 @@ package com.example.trolyyte.di;
 
 import android.content.Context;
 
+import com.example.trolyyte.domain.repository.ReminderRepository;
+import com.example.trolyyte.domain.repository.UserProfileRepository;
+import com.example.trolyyte.data.repository.ReminderRepositoryImpl;
+import com.example.trolyyte.data.repository.UserProfileRepositoryImpl;
+
 import com.example.trolyyte.data.asr.AsrEngine;
 import com.example.trolyyte.data.asr.VoskAsrEngine;
 import com.example.trolyyte.data.nlu.NlpEngine;
@@ -41,7 +46,8 @@ public class AppContainer {
     public AsrRepository asrRepository;
     public NlpRepository nlpRepository;
     public TtsRepository ttsRepository;
-
+    public ReminderRepository reminderRepository;
+    public UserProfileRepository userProfileRepository;
     // --- 3. Providers & Managers (Tầng Domain) ---
     public ResponseTextProvider responseTextProvider;
     public DialogueManager dialogueManager;
@@ -79,6 +85,8 @@ public class AppContainer {
         nlpRepository = new NlpRepositoryImpl(nlpEngine);
         ttsRepository = new TtsRepositoryImpl(ttsEngine);
 
+        reminderRepository = new ReminderRepositoryImpl();
+        userProfileRepository = new UserProfileRepositoryImpl(context);
 // C. Khởi tạo Helpers
         dialogueManager = new DialogueManagerImpl();
 // DefaultResponseTextProvider vừa dùng cho UI, vừa dùng cho TTS
