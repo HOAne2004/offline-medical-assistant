@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment;
 import com.example.trolyyte.R;
 import com.example.trolyyte.presentation.profile.ProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.example.trolyyte.presentation.calendar.CalendarFragment;
+import com.example.trolyyte.presentation.reminder.ReminderFragment;
 public class HomeActivity extends AppCompatActivity {
 
     @Override
@@ -31,7 +31,7 @@ public class HomeActivity extends AppCompatActivity {
                 selectedFragment = new HomeFragment();
             }
             else if(id == R.id.nav_reminders) {
-                selectedFragment = new CalendarFragment();
+                selectedFragment = new ReminderFragment();
             }
             else if (id == R.id.nav_profile) {
                 selectedFragment = new ProfileFragment();

@@ -60,13 +60,21 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    // 1. TensorFlow Lite (Core)
+    
+    // 1. TensorFlow Lite
+    // SỬA LỖI: Trả về bản 2.16.1 cho Select-TF-Ops vì bản 2.17.0 chưa có trên Maven Central
     implementation("org.tensorflow:tensorflow-lite:2.16.1")
     implementation("org.tensorflow:tensorflow-lite-select-tf-ops:2.16.1")
     implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
+    
     // 2. Gson (Để đọc file JSON tokenizer và label)
     implementation("com.google.code.gson:gson:2.10.1")
 
     // 3. Vosk Android & JNA
     implementation("com.alphacephei:vosk-android:0.3.47")
+
+    // 4. Room Database
+    val roomVersion = "2.6.1"
+    implementation("androidx.room:room-runtime:$roomVersion")
+    annotationProcessor("androidx.room:room-compiler:$roomVersion")
 }

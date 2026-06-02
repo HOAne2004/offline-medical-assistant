@@ -2,7 +2,11 @@ package com.example.trolyyte.di;
 
 import android.content.Context;
 
+import com.example.trolyyte.data.local.AppDatabase;
+import com.example.trolyyte.data.repository.SettingsRepositoryImpl;
+import com.example.trolyyte.data.utils.ReminderAlarmScheduler;
 import com.example.trolyyte.domain.repository.ReminderRepository;
+import com.example.trolyyte.domain.repository.SettingsRepository;
 import com.example.trolyyte.domain.repository.UserProfileRepository;
 import com.example.trolyyte.data.repository.ReminderRepositoryImpl;
 import com.example.trolyyte.data.repository.UserProfileRepositoryImpl;
@@ -37,6 +41,10 @@ import com.example.trolyyte.presentation.home.HomeViewModelFactory;
 
 public class AppContainer {
 
+    // --- 0. Database & Utils ---
+    private AppDatabase database;
+    private ReminderAlarmScheduler alarmScheduler;
+
     // --- 1. Engines (Tầng thấp nhất - Data Source) ---
     private AsrEngine asrEngine;
     private NlpEngine nlpEngine;
@@ -48,6 +56,8 @@ public class AppContainer {
     public TtsRepository ttsRepository;
     public ReminderRepository reminderRepository;
     public UserProfileRepository userProfileRepository;
+    public SettingsRepository settingsRepository;
+
     // --- 3. Providers & Managers (Tầng Domain) ---
     public ResponseTextProvider responseTextProvider;
     public DialogueManager dialogueManager;
@@ -67,46 +77,43 @@ public class AppContainer {
     }
 
     private void initializeDependencies() {
-// A. Khởi tạo Data Engines
+        // 0. Khởi tạo Database & Utils
+        database = AppDatabase.getDatabase(context);
+        alarmScheduler = new ReminderAlarmScheduler(context);
+
+        // A. Khởi tạo Data Engines
         asrEngine = new VoskAsrEngine(context);
-        asrEngine.initialize(); //giải nén model khi mở app
+        asrEngine.initialize(); 
         ttsEngine = new AndroidTtsEngine(context);
 
-// [QUAN TRỌNG] Chỗ này dễ dàng switch giữa Rule-Based và TFLite cho luận văn
-// Cách 1: Dùng Regex (Giai đoạn 1)
-        nlpEngine = new RuleBasedNlpEngine();
+        nlpEngine = new TfliteNlpEngine(context);
+        nlpEngine.initialize();
 
-// Cách 2: Dùng AI TFLite (Giai đoạn 2)
-//nlpEngine = new TfliteNlpEngine(context);
-//nlpEngine.initialize();
-
-// B. Khởi tạo Repositories
+        // B. Khởi tạo Repositories
         asrRepository = new AsrRepositoryImpl(asrEngine);
         nlpRepository = new NlpRepositoryImpl(nlpEngine);
         ttsRepository = new TtsRepositoryImpl(ttsEngine);
 
-        reminderRepository = new ReminderRepositoryImpl();
+        // CẬP NHẬT: Truyền cả Dao và Scheduler vào Repository
+        reminderRepository = new ReminderRepositoryImpl(database.reminderDao(), alarmScheduler);
+        
         userProfileRepository = new UserProfileRepositoryImpl(context);
-// C. Khởi tạo Helpers
+        settingsRepository = new SettingsRepositoryImpl(context);
+
+        // C. Khởi tạo Helpers
         dialogueManager = new DialogueManagerImpl();
-// DefaultResponseTextProvider vừa dùng cho UI, vừa dùng cho TTS
         responseTextProvider = new DefaultResponseTextProvider();
 
-// D. Khởi tạo UseCases
+        // D. Khởi tạo UseCases
         listenVoiceUseCase = new ListenVoiceUseCaseImpl(asrRepository);
         processTextUseCase = new ProcessTextUseCaseImpl(nlpRepository);
         handleDialogueUseCase = new HandleDialogueUseCaseImpl(dialogueManager);
 
-// Adapter: Chuyển đổi ResponseTextProvider thành ResponseTemplateProvider cho UseCase
-// (Do UseCase cần Interface Template, mà UI cần Interface TextProvider)
         ResponseTemplateProvider templateProvider = key -> responseTextProvider.getText(key.name());
         speakResponseUseCase = new SpeakResponseUseCaseImpl(templateProvider);
     }
 
-// E. Cung cấp Factory cho ViewModel
-// ViewModel cần Factory vì nó có tham số trong constructor
     public HomeViewModelFactory getHomeViewModelFactory() {
         return new HomeViewModelFactory(listenVoiceUseCase, processTextUseCase, handleDialogueUseCase, speakResponseUseCase, ttsRepository, responseTextProvider);
     }
 }
-

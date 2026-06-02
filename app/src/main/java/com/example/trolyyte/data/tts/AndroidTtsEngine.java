@@ -118,4 +118,15 @@ public class AndroidTtsEngine implements TtsEngine, TextToSpeech.OnInitListener 
             textToSpeech.shutdown();
         }
     }
+
+    @Override
+    public void setSpeechRate(float speed) {
+        if (textToSpeech != null) {
+            // Hàm mặc định của Android TTS: 1.0 là bình thường, < 1.0 là chậm, > 1.0 là nhanh
+            textToSpeech.setSpeechRate(speed);
+            Log.d(TAG, "Đã cài đặt tốc độ TTS thành: " + speed);
+        } else {
+            Log.w(TAG, "Chưa thể set tốc độ TTS vì TextToSpeech đang null");
+        }
+    }
 }
