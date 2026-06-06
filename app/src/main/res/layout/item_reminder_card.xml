@@ -6,157 +6,133 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="8dp"
-    app:cardCornerRadius="24dp"
-    app:cardElevation="2dp"
-    app:strokeWidth="2dp"
-    app:strokeColor="#1A73E8">
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="20dp">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <!-- 1. Phân biệt loại lịch: Icon Thuốc hoặc Lịch khám -->
-            <ImageView
-                android:id="@+id/ivTypeIcon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_centerVertical="true"
-                android:src="@drawable/ic_capsule" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_toEndOf="@id/ivTypeIcon"
-                android:layout_toStartOf="@id/layoutActions"
-                android:orientation="vertical"
-                android:layout_centerVertical="true">
-
-                <TextView
-                    android:id="@+id/tvMedicineInfo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="12:00 – Vitamin C"
-                    android:textColor="#333333"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvReminderStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Chưa thực hiện"
-                    android:textColor="#888888"
-                    android:textSize="16sp" />
-            </LinearLayout>
-
-            <!-- Chức năng Sửa/Xóa và Chuông -->
-            <LinearLayout
-                android:id="@+id/layoutActions"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/ivEdit"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:padding="12dp"
-                    android:src="@drawable/ic_edit"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    app:tint="#1A73E8"
-                    android:contentDescription="Sửa lịch nhắc" />
-
-                <ImageView
-                    android:id="@+id/ivDelete"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:padding="12dp"
-                    android:src="@drawable/ic_delete"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    app:tint="#F44336"
-                    android:contentDescription="Xóa lịch nhắc" />
-
-                <ImageView
-                    android:id="@+id/ivBell"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:padding="12dp"
-                    android:src="@drawable/ic_bell"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    app:tint="#1A73E8"
-                    android:contentDescription="Bật/Tắt thông báo" />
-            </LinearLayout>
-        </RelativeLayout>
-
-        <!-- 3. Khu vực chọn thời gian (Expandable) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/ivTypeIcon"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_capsule"
+                app:tint="#1A73E8"/>
+
+            <TextView
+                android:id="@+id/tvMedicineName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:text="Vitamin C"
+                android:textColor="#212121"
+                android:textSize="22sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:background="@drawable/bg_timer_panel"
-            android:orientation="vertical"
-            android:padding="12dp">
+            android:gravity="center"
+            android:text="12:00"
+            android:textColor="#1A73E8"
+            android:textSize="32sp"
+            android:textStyle="bold"/>
 
-            <!-- Hàng 1 (Luôn hiện) -->
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-                <TextView
-                    android:id="@+id/tvTimeLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:text="Thời gian nhắc trước:"
-                    android:textColor="#1A73E8"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <ImageView
-                    android:id="@+id/ivExpand"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_alignParentEnd="true"
-                    android:padding="12dp"
-                    android:src="@drawable/ic_expand_more"
-                    app:tint="#1A73E8" />
-            </RelativeLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal">
+                android:layout_weight="1"
+                android:text="🔴 Chưa thực hiện"
+                android:textColor="#D32F2F"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
 
-                <TextView android:id="@+id/btn5m" style="@style/TimerButtonStyle" android:text="5\nphút" />
-                <TextView android:id="@+id/btn10m" style="@style/TimerButtonStyle" android:text="10\nphút" />
-                <TextView android:id="@+id/btn15m" style="@style/TimerButtonStyle" android:text="15\nphút" />
-            </LinearLayout>
-
-            <!-- Hàng 2 (Mặc định visibility="gone") -->
-            <LinearLayout
-                android:id="@+id/layoutExtraTime"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/tvReminderBefore"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal"
-                android:visibility="gone">
+                android:text="🔔 Trước 15p"
+                android:textColor="#616161"
+                android:textSize="16sp"/>
+        </LinearLayout>
 
-                <TextView android:id="@+id/btn30m" style="@style/TimerButtonStyle" android:text="30\nphút" />
-                <TextView android:id="@+id/btn1h" style="@style/TimerButtonStyle" android:text="1\ngiờ" />
-                <TextView android:id="@+id/btn2h" style="@style/TimerButtonStyle" android:text="2\ngiờ" />
-            </LinearLayout>
+        <TextView
+            android:id="@+id/tvDosage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="💊 Liều lượng: 1 viên"
+            android:textColor="#424242"
+            android:textSize="17sp"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/tvInstruction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="📝 Ghi chú: Uống sau ăn"
+            android:textColor="#616161"
+            android:textSize="16sp"
+            android:visibility="gone"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCompleted"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="20dp"
+            android:text="✓ TÔI ĐÃ THỰC HIỆN"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:cornerRadius="16dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEdit"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_weight="1"
+                android:text="✏ Sửa"/>
+
+            <Space
+                android:layout_width="12dp"
+                android:layout_height="1dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDelete"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_weight="1"
+                android:text="🗑 Xóa"/>
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

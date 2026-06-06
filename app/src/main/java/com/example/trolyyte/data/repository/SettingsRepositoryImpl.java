@@ -23,4 +23,14 @@ public class SettingsRepositoryImpl implements SettingsRepository {
         // Nếu chưa lưu lần nào, trả về tốc độ mặc định là 1.0f (Bình thường)
         return prefs.getFloat(KEY_TTS_SPEED, 1.0f);
     }
+
+    @Override
+    public int getHistoryRetentionDays(){
+        return 3;
+    }
+
+    @Override
+    public void saveHistoryRetentionDays(int days){
+        prefs.edit().putInt("history_retention_days", days).apply();
+    }
 }

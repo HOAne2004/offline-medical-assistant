@@ -59,6 +59,13 @@ public class SettingsFragment extends Fragment {
             binding.tvSpeedLabel.setText(label);
         });
 
+        viewModel.getRetentionDays().observe(getViewLifecycleOwner(), days -> {
+            if (binding.sliderRetentionDays.getValue() != days) {
+                binding.sliderRetentionDays.setValue(days);
+            }
+            binding.tvRetentionLabel.setText("Hiện tại: Giữ trong " + days + " ngày");
+        });
+
         viewModel.getIsSaved().observe(getViewLifecycleOwner(), isSaved -> {
             if (isSaved) {
                 Toast.makeText(requireContext(), "Đã lưu cài đặt giọng nói!", Toast.LENGTH_SHORT).show();
@@ -84,10 +91,21 @@ public class SettingsFragment extends Fragment {
             viewModel.testVoice(currentSelectedSpeed);
         });
 
+        binding.sliderRetentionDays.addOnChangeListener((slider, value, fromUser) -> {
+            if (fromUser) viewModel.updateRetentionTemporary((int) value);
+        });
+
         // Nút Lưu Cài Đặt
         binding.btnSaveSettings.setOnClickListener(v -> {
             float finalSpeed = binding.sliderVoiceSpeed.getValue();
-            viewModel.saveSettings(finalSpeed);
+            int finalDays = (int)binding.sliderRetentionDays.getValue();
+            viewModel.saveSettings(finalSpeed, finalDays);
+        });
+
+        binding.btnBack.setOnClickListener(v -> {
+            if (getParentFragmentManager() != null) {
+                getParentFragmentManager().popBackStack();
+            }
         });
     }
 

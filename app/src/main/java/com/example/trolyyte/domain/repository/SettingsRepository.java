@@ -6,4 +6,7 @@ public interface SettingsRepository {
 
     // Lấy tốc độ đọc đang lưu (TV4 nhớ set giá trị mặc định là 1.0f nhé)
     float getTtsSpeed();
+
+    int getHistoryRetentionDays();
+    void saveHistoryRetentionDays(int days);
 }

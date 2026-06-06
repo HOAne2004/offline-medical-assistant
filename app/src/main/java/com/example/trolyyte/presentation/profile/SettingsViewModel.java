@@ -15,6 +15,10 @@ public class SettingsViewModel extends ViewModel {
     private final MutableLiveData<Float> _currentSpeed = new MutableLiveData<>();
     public LiveData<Float> getCurrentSpeed() { return _currentSpeed; }
 
+    // Quản lý trạng thái số ngày lưu lịch sử
+    private final MutableLiveData<Integer> _retentionDays = new MutableLiveData<>();
+    public LiveData<Integer> getRetentionDays() { return _retentionDays; }
+
     // Thông báo lưu thành công
     private final MutableLiveData<Boolean> _isSaved = new MutableLiveData<>(false);
     public LiveData<Boolean> getIsSaved() { return _isSaved; }
@@ -41,10 +45,11 @@ public class SettingsViewModel extends ViewModel {
         ttsRepository.setSpeed(speed);
         ttsRepository.speak("Xin chào, đây là tốc độ giọng nói bác vừa chọn.");
     }
-
+    public void updateRetentionTemporary(int days) { _retentionDays.setValue(days); }
     // Khi người dùng bấm "Lưu cài đặt"
-    public void saveSettings(float speed) {
+    public void saveSettings(float speed, int days) {
         settingsRepository.saveTtsSpeed(speed);
+        settingsRepository.saveHistoryRetentionDays(days);
         ttsRepository.setSpeed(speed); // Chốt tốc độ mới cho toàn hệ thống
         _isSaved.setValue(true);
     }

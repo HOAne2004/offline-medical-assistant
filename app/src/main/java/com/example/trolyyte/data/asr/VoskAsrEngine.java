@@ -75,7 +75,6 @@ public class VoskAsrEngine implements AsrEngine, RecognitionListener {
             Recognizer recognizer = new Recognizer(model, 16000.0f);
             speechService = new SpeechService(recognizer, 16000.0f);
             speechService.startListening(this);
-
             callback.onReady(); // Báo UI là đã bắt đầu nghe
 
         } catch (IOException e) {

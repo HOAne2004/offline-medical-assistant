@@ -12,10 +12,17 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.trolyyte.MedicalAssistantApplication;
 import com.example.trolyyte.databinding.FragmentPersonalInfoBinding;
 import com.example.trolyyte.di.AppContainer;
+import com.example.trolyyte.domain.model.UserProfile;
 
 public class PersonalInfoFragment extends Fragment {
     private FragmentPersonalInfoBinding binding;
     private ProfileViewModel viewModel;
+
+    // Lưu lại profile hiện tại để khi cập nhật không làm mất các trường khác (như tuổi, giới tính...)
+    private UserProfile currentUserProfile = new UserProfile();
+
+    // Biến cờ để biết người dùng vừa bấm nút lưu, dùng để hiển thị Toast đúng lúc
+    private boolean isSaving = false;
 
     @Nullable
     @Override
@@ -33,43 +40,75 @@ public class PersonalInfoFragment extends Fragment {
     }
 
     private void setupViewModel() {
-        // Lấy container từ Activity chứa Fragment này
+        // CẬP NHẬT: Lấy factory đã chứa sẵn các UseCase từ AppContainer
         AppContainer container = ((MedicalAssistantApplication) requireActivity().getApplication()).appContainer;
-        ProfileViewModelFactory factory = new ProfileViewModelFactory(container.userProfileRepository);
+        ProfileViewModelFactory factory = container.getProfileViewModelFactory();
+
         viewModel = new ViewModelProvider(this, factory).get(ProfileViewModel.class);
     }
 
     private void observeUiState() {
-        // LUÔN DÙNG getViewLifecycleOwner() trong Fragment để tránh rò rỉ bộ nhớ
         viewModel.getUiState().observe(getViewLifecycleOwner(), state -> {
-            if (binding.etName.getText().toString().isEmpty() && !state.getName().isEmpty()) {
-                binding.etName.setText(state.getName());
-                binding.etPhone.setText(state.getEmergencyPhone());
-                binding.etHistory.setText(state.getMedicalHistory());
-            }
+            if (state instanceof ProfileUiState.Loading) {
+                // Đang tải hoặc đang lưu dữ liệu
+                binding.loadingBar.setVisibility(View.VISIBLE);
+                binding.btnSave.setEnabled(false);
 
-            binding.loadingBar.setVisibility(state.isLoading() ? View.VISIBLE : View.GONE);
-            binding.btnSave.setEnabled(!state.isLoading());
+            } else if (state instanceof ProfileUiState.Success) {
+                // Xử lý thành công (Lấy dữ liệu lên hoặc lưu xong)
+                binding.loadingBar.setVisibility(View.GONE);
+                binding.btnSave.setEnabled(true);
 
-            if (state.isSaved()) {
-                Toast.makeText(getContext(), "Đã cập nhật hồ sơ thành công!", Toast.LENGTH_SHORT).show();
-                viewModel.resetSaveState();
+                currentUserProfile = ((ProfileUiState.Success) state).getProfile();
+
+                // Chỉ set text nếu ô đang trống (tránh việc ghi đè khi user đang gõ chữ)
+                if (binding.etName.getText().toString().isEmpty() && currentUserProfile.getName() != null) {
+                    binding.etName.setText(currentUserProfile.getName());
+                    binding.etPhone.setText(currentUserProfile.getEmergencyPhone());
+                    binding.etHistory.setText(currentUserProfile.getMedicalHistory());
+                }
+
+                // Nếu trước đó vừa bấm nút lưu, hiển thị thông báo thành công
+                if (isSaving) {
+                    Toast.makeText(getContext(), "Đã cập nhật hồ sơ thành công!", Toast.LENGTH_SHORT).show();
+                    isSaving = false; // Reset cờ
+                }
+
+            } else if (state instanceof ProfileUiState.Error) {
+                // Xử lý lỗi
+                binding.loadingBar.setVisibility(View.GONE);
+                binding.btnSave.setEnabled(true);
+                isSaving = false;
+
+                String errorMsg = ((ProfileUiState.Error) state).getMessage();
+                Toast.makeText(getContext(), "Lỗi: " + errorMsg, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void setupListeners() {
         binding.btnSave.setOnClickListener(v -> {
-            String name = binding.etName.getText().toString();
-            String phone = binding.etPhone.getText().toString();
-            String history = binding.etHistory.getText().toString();
-            viewModel.saveProfile(name, phone, history);
+            // Cập nhật các trường trên giao diện vào Object profile hiện tại
+            currentUserProfile.setName(binding.etName.getText().toString());
+            currentUserProfile.setEmergencyPhone(binding.etPhone.getText().toString());
+            currentUserProfile.setMedicalHistory(binding.etHistory.getText().toString());
+
+            isSaving = true; // Bật cờ đang lưu
+
+            // Gọi ViewModel đẩy xuống DB
+            viewModel.saveProfile(currentUserProfile);
+        });
+
+        binding.btnBack.setOnClickListener(v -> {
+            if (getParentFragmentManager() != null) {
+                getParentFragmentManager().popBackStack();
+            }
         });
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null; // Bắt buộc giải phóng ViewBinding khi Fragment bị hủy
+        binding = null;
     }
 }

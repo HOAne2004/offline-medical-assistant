@@ -5,14 +5,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import com.example.trolyyte.R;
 import com.example.trolyyte.presentation.profile.ProfileFragment;
+import com.example.trolyyte.presentation.schedule.ScheduleFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.example.trolyyte.presentation.reminder.ReminderFragment;
 public class HomeActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home); // File này chỉ chứa FragmentContainer và BottomNav (đã hướng dẫn ở trả lời trước)
+        setContentView(R.layout.activity_home);
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
 
@@ -30,8 +30,8 @@ public class HomeActivity extends AppCompatActivity {
             if (id == R.id.nav_home) {
                 selectedFragment = new HomeFragment();
             }
-            else if(id == R.id.nav_reminders) {
-                selectedFragment = new ReminderFragment();
+            else if(id == R.id.nav_schdule) {
+                selectedFragment = new ScheduleFragment();
             }
             else if (id == R.id.nav_profile) {
                 selectedFragment = new ProfileFragment();

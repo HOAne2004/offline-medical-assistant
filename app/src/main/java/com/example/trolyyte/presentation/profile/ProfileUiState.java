@@ -1,41 +1,35 @@
 package com.example.trolyyte.presentation.profile;
 
-public class ProfileUiState {
-    private final String name;
-    private final String emergencyPhone;
-    private final String medicalHistory;
-    private final boolean isLoading;
-    private final boolean isSaved;
-    private final String errorMessage;
+import com.example.trolyyte.domain.model.UserProfile;
 
-    public ProfileUiState(String name, String emergencyPhone, String medicalHistory, boolean isLoading, boolean isSaved, String errorMessage) {
-        this.name = name;
-        this.emergencyPhone = emergencyPhone;
-        this.medicalHistory = medicalHistory;
-        this.isLoading = isLoading;
-        this.isSaved = isSaved;
-        this.errorMessage = errorMessage;
+public abstract class ProfileUiState {
+
+    // Trạng thái đang tải
+    public static class Loading extends ProfileUiState {}
+
+    // Trạng thái thành công, mang theo dữ liệu Profile
+    public static class Success extends ProfileUiState {
+        private final UserProfile profile;
+
+        public Success(UserProfile profile) {
+            this.profile = profile;
+        }
+
+        public UserProfile getProfile() {
+            return profile;
+        }
     }
 
-    public static ProfileUiState idle() {
-        return new ProfileUiState("", "", "", false, false, null);
-    }
+    // Trạng thái lỗi
+    public static class Error extends ProfileUiState {
+        private final String message;
 
-    public String getName() { return name; }
-    public String getEmergencyPhone() { return emergencyPhone; }
-    public String getMedicalHistory() { return medicalHistory; }
-    public boolean isLoading() { return isLoading; }
-    public boolean isSaved() { return isSaved; }
-    public String getErrorMessage() { return errorMessage; }
+        public Error(String message) {
+            this.message = message;
+        }
 
-    public ProfileUiState copyWith(String name, String emergencyPhone, String medicalHistory, boolean isLoading, boolean isSaved, String errorMessage) {
-        return new ProfileUiState(
-                name != null ? name : this.name,
-                emergencyPhone != null ? emergencyPhone : this.emergencyPhone,
-                medicalHistory != null ? medicalHistory : this.medicalHistory,
-                isLoading,
-                isSaved,
-                errorMessage
-        );
+        public String getMessage() {
+            return message;
+        }
     }
 }

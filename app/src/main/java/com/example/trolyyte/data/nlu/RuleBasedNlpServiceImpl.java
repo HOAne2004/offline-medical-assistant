@@ -1,7 +1,7 @@
 package com.example.trolyyte.data.nlu;
 
-import com.example.trolyyte.domain.model.NlpResult;
 import com.example.trolyyte.domain.ai.NlpService;
+import com.example.trolyyte.domain.model.NlpResult;
 
 public class RuleBasedNlpServiceImpl implements NlpService {
 

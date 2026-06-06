@@ -3,40 +3,65 @@ package com.example.trolyyte.presentation.profile;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-import com.example.trolyyte.domain.repository.UserProfileRepository;
+
+import com.example.trolyyte.domain.model.UserProfile;
+import com.example.trolyyte.domain.usecase.GetUserProfileUseCase;
+import com.example.trolyyte.domain.usecase.SaveUserProfileUseCase;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ProfileViewModel extends ViewModel {
-    private final UserProfileRepository repository;
-    private final MutableLiveData<ProfileUiState> _uiState = new MutableLiveData<>(ProfileUiState.idle());
+    private final GetUserProfileUseCase getUserProfileUseCase;
+    private final SaveUserProfileUseCase saveUserProfileUseCase;
 
-    public ProfileViewModel(UserProfileRepository repository) {
-        this.repository = repository;
+    private final MutableLiveData<ProfileUiState> _uiState = new MutableLiveData<>();
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+    public ProfileViewModel(GetUserProfileUseCase getUserProfileUseCase, SaveUserProfileUseCase saveUserProfileUseCase) {
+        this.getUserProfileUseCase = getUserProfileUseCase;
+        this.saveUserProfileUseCase = saveUserProfileUseCase;
         loadProfile();
     }
 
     public LiveData<ProfileUiState> getUiState() { return _uiState; }
 
-    private void loadProfile() {
-        String name = repository.getUserName();
-        String phone = repository.getEmergencyPhone();
-        String history = repository.getMedicalHistory();
-        _uiState.setValue(new ProfileUiState(name, phone, history, false, false, null));
+    public void loadProfile() {
+        _uiState.postValue(new ProfileUiState.Loading()); // Cập nhật UI ở Main Thread
+
+        executorService.execute(() -> {
+            try {
+                // Lấy profile từ Database thông qua UseCase
+                UserProfile profile = getUserProfileUseCase.execute();
+                _uiState.postValue(new ProfileUiState.Success(profile)); // postValue từ Background Thread
+            } catch (Exception e) {
+                _uiState.postValue(new ProfileUiState.Error(e.getMessage()));
+            }
+        });
     }
 
-    public void saveProfile(String name, String phone, String history) {
-        _uiState.setValue(_uiState.getValue().copyWith(null, null, null, true, false, null));
-        try {
-            repository.saveProfile(name, phone, history);
-            _uiState.setValue(new ProfileUiState(name, phone, history, false, true, null));
-        } catch (Exception e) {
-            _uiState.setValue(_uiState.getValue().copyWith(null, null, null, false, false, e.getMessage()));
-        }
+    public void saveProfile(UserProfile profile) {
+        _uiState.postValue(new ProfileUiState.Loading());
+
+        executorService.execute(() -> {
+            try {
+                // Lưu profile xuống Database
+                saveUserProfileUseCase.execute(profile);
+
+                // Tải lại dữ liệu để cập nhật UI thành công
+                loadProfile();
+            } catch (Exception e) {
+                _uiState.postValue(new ProfileUiState.Error("Lỗi khi lưu: " + e.getMessage()));
+            }
+        });
     }
 
-    public void resetSaveState() {
-        ProfileUiState current = _uiState.getValue();
-        if (current != null) {
-            _uiState.setValue(current.copyWith(null, null, null, false, false, null));
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        // Ngắt luồng ngầm để chống tràn bộ nhớ (Memory Leak)
+        if (executorService != null && !executorService.isShutdown()) {
+            executorService.shutdownNow();
         }
     }
 }
