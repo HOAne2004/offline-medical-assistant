@@ -16,6 +16,7 @@ import com.example.trolyyte.data.local.AppDatabase;
 import com.example.trolyyte.databinding.FragmentHistoryBinding;
 import com.example.trolyyte.di.AppContainer;
 import com.example.trolyyte.domain.model.Appointment;
+import com.example.trolyyte.domain.model.ReminderHistory;
 import com.example.trolyyte.domain.model.ReminderHistoryWithTemplate;
 import com.example.trolyyte.presentation.schedule.ScheduleAdapter;
 import com.example.trolyyte.presentation.schedule.ScheduleItem;
@@ -106,8 +107,19 @@ public class HistoryFragment extends Fragment implements ScheduleAdapter.Schedul
 
                 for (ReminderHistoryWithTemplate r : reminders) {
                     combinedList.add(new ScheduleItem(r));
-                    if (r.history.isCompleted()) completedReminders++;
-                    if (r.history.isMissed()) missedReminders++;
+
+                    long now = System.currentTimeMillis();
+
+                    // NẾU ĐÃ HOÀN THÀNH
+                    if (r.history.isCompleted()) {
+                        completedReminders++;
+                    }
+                    // NẾU ĐÃ BỎ LỠ TRONG DB HOẶC ĐÃ QUÁ THỜI GIAN DUNG SAI NHƯNG CHƯA HOÀN THÀNH
+                    else if (r.history.isMissed() ||
+                            (r.history.getStatus() != ReminderHistory.Status.COMPLETED_PENDING &&
+                                    now > r.history.getScheduledTimeMillis() + (r.template.getCompletionWindowMinutes() * 60 * 1000L))) {
+                        missedReminders++;
+                    }
                 }
 
                 int completedAppts = 0;
