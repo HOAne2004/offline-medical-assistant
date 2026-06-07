@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import com.example.trolyyte.domain.usecase.ListenVoiceResult; // Đảm bảo import đúng
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.vosk.Model;
 import org.vosk.Recognizer;
@@ -12,6 +13,9 @@ import org.vosk.android.SpeechService;
 import org.vosk.android.StorageService;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 public class VoskAsrEngine implements AsrEngine, RecognitionListener {
 
@@ -25,6 +29,8 @@ public class VoskAsrEngine implements AsrEngine, RecognitionListener {
     private boolean isModelLoaded = false;
     private boolean isInitializing = false; // Cờ mới để chặn init nhiều lần
 
+    private String cachedGrammar = null;
+
     public VoskAsrEngine(Context context) {
         this.context = context;
     }
@@ -36,7 +42,7 @@ public class VoskAsrEngine implements AsrEngine, RecognitionListener {
 
         isInitializing = true; // Đánh dấu đang load
         Log.d(TAG, "Bắt đầu giải nén Model Vosk...");
-
+        prepareGrammar();
         StorageService.unpack(context, "model-vn", "model",
                 (model) -> {
                     this.model = model;
@@ -99,6 +105,7 @@ public class VoskAsrEngine implements AsrEngine, RecognitionListener {
 
                     // 5. Nhóm từ vựng - Số đếm (Giờ giấc)
                     "\"một\", \"hai\", \"ba\", \"bốn\", \"năm\", \"sáu\", \"bảy\", \"tám\", \"chín\", \"mười\", \"mười một\", \"mười hai\", " +
+                    "\"ngày mai\", \"ngày kia\", " +
 
                     // 6. Nhóm từ vựng - Bổ trợ
                     "\"với\", \"quá\", \"đang\", \"bị\", \"đau\", \"ngay\", \"lập\", \"tức\", \"giúp\", \"dữ\", \"dội\", " +
@@ -174,6 +181,68 @@ public class VoskAsrEngine implements AsrEngine, RecognitionListener {
             return jsonObject.optString(key, "");
         } catch (Exception e) {
             return "";
+        }
+    }
+
+    private void prepareGrammar() {
+        if (cachedGrammar != null) return; // Nếu đã build rồi thì thôi
+
+        try {
+            Set<String> vocab = new HashSet<>();
+
+            // 1. Đọc file medical_dict.json từ thư mục assets
+            InputStream is = context.getAssets().open("medical_dict.json");
+            byte[] buffer = new byte[is.available()];
+            is.read(buffer);
+            is.close();
+            String jsonStr = new String(buffer, "UTF-8");
+
+            // 2. Phân tích JSON
+            JSONArray root = new JSONArray(jsonStr);
+            for (int i = 0; i < root.length(); i++) {
+                JSONObject intentObj = root.getJSONObject(i);
+                JSONArray entries = intentObj.getJSONArray("entries");
+
+                for (int j = 0; j < entries.length(); j++) {
+                    JSONObject entry = entries.getJSONObject(j);
+                    String raw = entry.optString("raw", "").toLowerCase().trim();
+                    String norm = entry.optString("normalized", "").toLowerCase().trim();
+
+                    // Thêm nguyên Cụm từ (Để fix cứng độ chính xác cho Vosk)
+                    if (!raw.isEmpty()) vocab.add(raw);
+                    if (!norm.isEmpty()) vocab.add(norm);
+
+                    // Băm nhỏ thành Từng từ (Để NLU linh hoạt bóc tách slot: giờ, tên thuốc)
+                    if (!raw.isEmpty()) {
+                        for (String w : raw.split("\\s+")) vocab.add(w);
+                    }
+                    if (!norm.isEmpty()) {
+                        for (String w : norm.split("\\s+")) vocab.add(w);
+                    }
+                }
+            }
+
+            // 3. Bổ sung các từ khóa thời gian, số đếm (Phòng hờ trong file JSON bị thiếu)
+            String[] extras = {"một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín", "mười", "mười một", "mười hai",
+                    "giờ", "phút", "sáng", "trưa", "chiều", "tối", "nay", "mai", "kia", "có", "không", "[unk]"};
+            for (String e : extras) vocab.add(e);
+
+            // 4. Đóng gói thành chuỗi JSON Array cho Vosk
+            StringBuilder sb = new StringBuilder("[");
+            int count = 0;
+            for (String w : vocab) {
+                sb.append("\"").append(w).append("\"");
+                if (count < vocab.size() - 1) sb.append(", ");
+                count++;
+            }
+            sb.append("]");
+
+            cachedGrammar = sb.toString();
+            Log.d(TAG, "Đã build Grammar tự động từ JSON thành công với " + vocab.size() + " từ/cụm từ.");
+
+        } catch (Exception e) {
+            Log.e(TAG, "Lỗi đọc medical_dict.json: " + e.getMessage());
+            cachedGrammar = "[\"[unk]\"]"; // Fallback an toàn nếu file JSON lỗi
         }
     }
 }
