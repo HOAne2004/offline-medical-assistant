@@ -15,53 +15,91 @@ import androidx.core.content.ContextCompat;
 
 import com.example.trolyyte.R;
 import com.example.trolyyte.data.nlu.TfliteNlpEngine;
+import com.example.trolyyte.data.wakeword.WakeWordService;
 import com.example.trolyyte.domain.model.NlpResult;
 import com.example.trolyyte.presentation.home.HomeActivity;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final int REQUEST_PERMISSIONS = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Khởi tạo TFLite Engine
-        TfliteNlpEngine nluEngine = new TfliteNlpEngine(this);
-        nluEngine.initialize(); // QUAN TRỌNG: Phải gọi initialize() để load file model lên RAM
+        // Nếu app được mở do nói "Bác sĩ ơi"
+        if (getIntent() != null && getIntent().getBooleanExtra("WAKE_WORD_DETECTED", false)) {
+            startWakeWordService();
+            navigateToHome();
+            return;
+        }
 
-        // Thử cho AI phân tích 1 câu
+        //testNluEngine();
+
+        requestNeededPermissions();
+    }
+
+    private void testNluEngine() {
+        TfliteNlpEngine nluEngine = new TfliteNlpEngine(this);
+        nluEngine.initialize();
+
         String testSentence = "nhắc tôi uống 2 viên paracetamol sau ăn lúc 8 giờ sáng";
 
-        // Gọi hàm analyze thay vì predictIntent
         NlpResult result = nluEngine.analyze(testSentence);
 
-        // In kết quả ra Logcat
         android.util.Log.d("NLU_TEST", "Câu hỏi: " + testSentence);
         android.util.Log.d("NLU_TEST", "Dự đoán Intent: " + result.getIntent().name());
         android.util.Log.d("NLU_TEST", "Độ tự tin: " + (result.getConfidence() * 100) + "%");
+    }
 
-        // Kiểm tra quyền trên Android 13+ (TIRAMISU)
+    private void requestNeededPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                // Đứng yên ở màn hình này và xin quyền
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
-            } else {
-                // Đã có quyền từ trước -> Đếm ngược vào app
-                startTimer();
-            }
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{
+                            Manifest.permission.POST_NOTIFICATIONS,
+                            Manifest.permission.RECORD_AUDIO
+                    },
+                    REQUEST_PERMISSIONS
+            );
         } else {
-            // Android cũ không cần xin quyền này
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{
+                            Manifest.permission.RECORD_AUDIO
+                    },
+                    REQUEST_PERMISSIONS
+            );
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(
+            int requestCode,
+            @NonNull String[] permissions,
+            @NonNull int[] grantResults
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_PERMISSIONS) {
+            startWakeWordService();
             startTimer();
         }
     }
 
-    // Hàm này tự động chạy sau khi người dùng bấm "Cho phép" hoặc "Từ chối"
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 101) {
-            // Dù họ cho phép hay từ chối, ta vẫn đếm ngược 1 giây rồi vào màn hình chính
-            startTimer();
+    private void startWakeWordService() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        Intent intent = new Intent(this, WakeWordService.class);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ContextCompat.startForegroundService(this, intent);
+        } else {
+            startService(intent);
         }
     }
 
@@ -71,7 +109,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void navigateToHome() {
         Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+
+        if (getIntent() != null && getIntent().getBooleanExtra("WAKE_WORD_DETECTED", false)) {
+            intent.putExtra("WAKE_WORD_DETECTED", true);
+        }
+
         startActivity(intent);
         finish();
     }
+
 }

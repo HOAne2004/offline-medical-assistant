@@ -12,6 +12,10 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <!-- Thêm cho WakeWordService chạy nền bằng microphone -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+
     <uses-feature android:name="android.hardware.telephony" android:required="false" />
 
     <application
@@ -38,6 +42,13 @@
         <activity
             android:name=".presentation.home.HomeActivity"
             android:exported="false" />
+
+        <!-- Thêm WakeWordService -->
+        <service
+            android:name=".data.wakeword.WakeWordService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
 
         <!-- Đăng ký Receiver -->
         <receiver
