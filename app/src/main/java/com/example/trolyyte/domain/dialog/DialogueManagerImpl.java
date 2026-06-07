@@ -32,13 +32,58 @@ public class DialogueManagerImpl implements DialogueManager {
         }
     }
 
-    private DialogueResult handleIdleState(NluIntent intent, NlpResult nlpResult, DialogContext context) {
-        if (intent == NluIntent.SET_OR_UPDATE_MEDICATION) {
-            context.setCurrentState(DialogState.COLLECTING_MEDICINE_INFO);
-            fillSlots(nlpResult, context);
-            return checkMissingInfoOrConfirm(context);
+    private DialogueResult handleIdleState(
+            NluIntent intent,
+            NlpResult nlpResult,
+            DialogContext context
+    ) {
+
+        switch (intent) {
+
+            // =================================================
+            // NHẮC THUỐC
+            // =================================================
+            case SET_OR_UPDATE_MEDICATION:
+                context.setCurrentState(DialogState.COLLECTING_MEDICINE_INFO);
+                fillSlots(nlpResult, context);
+                return checkMissingInfoOrConfirm(context);
+
+            // =================================================
+            // HỎI THUỐC
+            // =================================================
+            case INQUIRE_MEDICINE:
+                return new DialogueResult(
+                        DialogueAction.SHOW_MEDICINE_INFO,
+                        context
+                );
+
+            // =================================================
+            // TRÒ CHUYỆN
+            // =================================================
+            case SMALL_TALK:
+                return new DialogueResult(
+                        DialogueAction.COMPLETE_DIALOGUE,
+                        context
+                );
+
+            // =================================================
+            // KHẨN CẤP
+            // =================================================
+            case REQUEST_EMERGENCY:
+                return new DialogueResult(
+                        DialogueAction.ASK_CONFIRM_EMERGENCY,
+                        context
+                );
+
+            // =================================================
+            // KHÔNG HIỂU
+            // =================================================
+            default:
+                return new DialogueResult(
+                        DialogueAction.UNKNOWN_COMMAND,
+                        context
+                );
         }
-        return new DialogueResult(DialogueAction.UNKNOWN_COMMAND, context);
     }
 
     private DialogueResult handleCollectingMedicineInfo(NluIntent intent, NlpResult nlpResult, DialogContext context) {

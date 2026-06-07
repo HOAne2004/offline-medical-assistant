@@ -35,7 +35,7 @@ public class TfliteNlpEngine implements NlpEngine {
     private static final int MAX_SEQUENCE_LENGTH = 30;
 
     // ĐÃ SỬA: Hạ Threshold xuống để AI đỡ bị "bắt bẻ" do dữ liệu train nhỏ
-    private static final float CONFIDENCE_THRESHOLD = 0.65f;
+    private static final float CONFIDENCE_THRESHOLD = 0.35f;
 
     private final Context context;
     private Interpreter tflite;
@@ -107,11 +107,109 @@ public class TfliteNlpEngine implements NlpEngine {
         int maxIndex = argMax(output[0]);
         float confidence = output[0][maxIndex];
 
-        String labelStr = "fallback";
-        if (confidence >= CONFIDENCE_THRESHOLD) {
-            labelStr = labelMap.getOrDefault(maxIndex, "fallback");
+//        String labelStr = "fallback";
+//
+//        if (confidence >= CONFIDENCE_THRESHOLD) {
+//            labelStr = labelMap.getOrDefault(maxIndex, "fallback");
+//        }
+//        NluIntent intent = mapLabelToIntent(labelStr);
+
+        // ======================================================
+// CHỌN INTENT THÔNG MINH HƠN (Hybrid AI + Rule-based)
+// ======================================================
+
+        String labelStr;
+        String aiLabel = labelMap.getOrDefault(maxIndex, "FALLBACK");
+
+// Log debug cực rõ
+        Log.d("NLU_TEST", "Confidence = " + confidence);
+        Log.d("NLU_TEST", "AI Label = " + aiLabel);
+
+// ------------------------------------------------------
+// CASE 1: AI đủ tự tin
+// ------------------------------------------------------
+        // ======================================================
+// HYBRID RULE-BASED ƯU TIÊN TRƯỚC AI
+// ======================================================
+
+        String lower = nluText.toLowerCase();
+
+// ------------------------------------------------------
+// RULE 1: THUỐC
+// ------------------------------------------------------
+        if (
+                lower.contains("thuốc") ||
+                        lower.contains("uống thuốc") ||
+                        lower.contains("nhắc thuốc")
+        ) {
+
+            labelStr = "INQUIRE_MEDICINE";
         }
+
+// ------------------------------------------------------
+// RULE 2: NHẮC THUỐC
+// ------------------------------------------------------
+        else if (
+                lower.contains("nhắc") &&
+                        lower.contains("uống")
+        ) {
+
+            labelStr = "SET_OR_UPDATE_MEDICATION";
+        }
+
+// ------------------------------------------------------
+// RULE 3: ĐẶT LỊCH KHÁM
+// ------------------------------------------------------
+        else if (
+                lower.contains("khám") ||
+                        lower.contains("bác sĩ") ||
+                        lower.contains("bệnh viện") ||
+                        lower.contains("đặt lịch")
+        ) {
+
+            labelStr = "SET_OR_UPDATE_APPOINTMENT";
+        }
+
+// ------------------------------------------------------
+// RULE 4: KHẨN CẤP
+// ------------------------------------------------------
+        else if (
+                lower.contains("cấp cứu") ||
+                        lower.contains("khó thở") ||
+                        lower.contains("đau ngực")
+        ) {
+
+            labelStr = "REQUEST_EMERGENCY";
+        }
+
+// ------------------------------------------------------
+// RULE 5: SMALL TALK
+// ------------------------------------------------------
+        else if (
+                lower.contains("xin chào") ||
+                        lower.contains("cảm ơn")
+        ) {
+
+            labelStr = "SMALL_TALK";
+        }
+
+// ------------------------------------------------------
+// AI FALLBACK
+// ------------------------------------------------------
+        else {
+
+            if (confidence >= CONFIDENCE_THRESHOLD) {
+                labelStr = aiLabel;
+            } else {
+                labelStr = "FALLBACK";
+            }
+        }
+
+// Convert sang Enum
         NluIntent intent = mapLabelToIntent(labelStr);
+
+// Log kết quả cuối cùng
+        Log.d("NLU_TEST", "FINAL INTENT = " + intent.name());
 
         // BƯỚC 5: TRÍCH XUẤT THỰC THỂ (Entity Extraction bằng Rule-based)
         Map<String, String> entities = RuleBasedEntityExtractor.extract(nluText);

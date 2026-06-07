@@ -260,6 +260,10 @@ public class HomeViewModel extends ViewModel {
                 speakAndListen("Hệ thống phát hiện tình trạng khẩn cấp. Bác có muốn gọi cho người thân ngay không ạ?");
                 break;
 
+            case SHOW_MEDICINE_INFO:
+                speak("Bác muốn hỏi thông tin thuốc gì ạ?");
+                break;
+
             case TRIGGER_EMERGENCY:
                 // BẮN ACTION MỞ MÀN HÌNH/GỌI ĐIỆN
                 actionLiveData.postValue(new EmergencyAction());
