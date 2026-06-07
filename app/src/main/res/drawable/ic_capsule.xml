@@ -1,0 +1,45 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!--
+    Viên thuốc con nhộng (Capsule) được thiết kế lại để trông chuyên nghiệp hơn.
+    Sử dụng Group để xoay nghiêng 45 độ, giúp Icon tự nhiên và cân đối.
+    Màu sắc: Nửa Xanh dương (#4FC3F7) và nửa Xanh lá (#81C784).
+    -->
+    <group
+        android:pivotX="12"
+        android:pivotY="12"
+        android:rotation="45">
+
+        <!-- Nửa phải (Xanh dương) -->
+        <path
+            android:fillColor="#4FC3F7"
+            android:strokeColor="#000000"
+            android:strokeWidth="0.5"
+            android:strokeAlpha="0.1"
+            android:pathData="M12,8.5 L17,8.5 C18.93,8.5 20.5,10.07 20.5,12 C20.5,13.93 18.93,15.5 17,15.5 L12,15.5 Z" />
+
+        <!-- Nửa trái (Xanh lá) -->
+        <path
+            android:fillColor="#81C784"
+            android:strokeColor="#000000"
+            android:strokeWidth="0.5"
+            android:strokeAlpha="0.1"
+            android:pathData="M12,8.5 L7,8.5 C5.07,8.5 3.5,10.07 3.5,12 C3.5,13.93 5.07,15.5 7,15.5 L12,15.5 Z" />
+
+        <!-- Vạch phân cách màu trắng ở giữa thân thuốc -->
+        <path
+            android:strokeColor="#FFFFFF"
+            android:strokeWidth="1"
+            android:strokeAlpha="0.8"
+            android:pathData="M12,8.5 L12,15.5" />
+
+        <!-- Hiệu ứng bóng sáng (Highlight) tạo khối 3D -->
+        <path
+            android:fillColor="#FFFFFF"
+            android:fillAlpha="0.3"
+            android:pathData="M15.5,10 L17.5,10 C18.05,10 18.5,10.45 18.5,11 C18.5,11.55 18.05,12 17.5,12 L15.5,12 C14.95,12 14.5,11.55 14.5,11 C14.5,10.45 14.95,10 15.5,10 Z" />
+    </group>
+</vector>

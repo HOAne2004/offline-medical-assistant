@@ -1,57 +1,92 @@
 package com.example.trolyyte.data.repository;
 
-import com.example.trolyyte.domain.model.Reminder;
+import com.example.trolyyte.data.local.dao.ReminderDao;
+import com.example.trolyyte.data.utils.ReminderAlarmScheduler;
+import com.example.trolyyte.domain.model.ReminderHistory;
+import com.example.trolyyte.domain.model.ReminderHistoryWithTemplate;
+import com.example.trolyyte.domain.model.ReminderTemplate;
 import com.example.trolyyte.domain.repository.ReminderRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ReminderRepositoryImpl implements ReminderRepository {
-    // Dùng ArrayList để mô phỏng Database trong bộ nhớ RAM
-    private final List<Reminder> reminders = new ArrayList<>();
+    private final ReminderDao reminderDao;
+    private final ReminderAlarmScheduler scheduler;
 
-    public ReminderRepositoryImpl() {
-        // Dummy data for testing (Dữ liệu giả để Leader test UI)
-        reminders.add(new Reminder("mock_1", Reminder.Type.MEDICINE, "Paracetamol", "08:00", false, 15, true));
-        reminders.add(new Reminder("mock_2", Reminder.Type.MEDICINE, "Vitamin C", "12:00", false, 15, true));
-        reminders.add(new Reminder("mock_3", Reminder.Type.MEDICINE, "Thuốc bổ", "19:00", false, 15, false));
+    public ReminderRepositoryImpl(ReminderDao reminderDao, ReminderAlarmScheduler scheduler) {
+        this.reminderDao = reminderDao;
+        this.scheduler = scheduler;
+    }
+
+    // ==========================================
+    // THAO TÁC VỚI TEMPLATE
+    // ==========================================
+    @Override
+    public void insertTemplate(ReminderTemplate template) {
+        reminderDao.insertTemplate(template);
     }
 
     @Override
-    public List<Reminder> getAllReminders() {
-        return new ArrayList<>(reminders);
+    public void updateTemplate(ReminderTemplate template) {
+        reminderDao.updateTemplate(template);
     }
 
     @Override
-    public List<Reminder> getRemindersByTime(String timeKeyword) {
-        List<Reminder> filteredList = new ArrayList<>();
-        // Tìm kiếm các lịch nhắc có chứa từ khóa thời gian
-        for (Reminder reminder : reminders) {
-            if (reminder.getTime().contains(timeKeyword)) {
-                filteredList.add(reminder);
+    public ReminderTemplate getTemplateById(String id) {
+        return reminderDao.getTemplateById(id);
+    }
+
+    @Override
+    public void deleteTemplate(ReminderTemplate template) {
+        reminderDao.deleteTemplate(template);
+        // Tạm ẩn: scheduler.cancel(template.getId());
+    }
+
+    // ==========================================
+    // THAO TÁC VỚI HISTORY
+    // ==========================================
+    @Override
+    public void insertHistory(ReminderHistory history) {
+        reminderDao.insertHistory(history);
+
+        // --- ĐOẠN NÀY LÀ CẦU NỐI ĐỂ KÍCH HOẠT BÁO THỨC ---
+        ReminderTemplate template = reminderDao.getTemplateById(history.getTemplateId());
+        if (template != null && history.getStatus() == ReminderHistory.Status.SCHEDULED) {
+            scheduler.schedule(history, template);
+        }
+    }
+
+    @Override
+    public void updateHistory(ReminderHistory history) {
+        reminderDao.updateHistory(history);
+
+        ReminderTemplate template = reminderDao.getTemplateById(history.getTemplateId());
+        if (template != null) {
+            // NẾU TRẠNG THÁI LÀ CHỜ (SCHEDULED / SNOOZED) -> CÀI LẠI BÁO THỨC MỚI
+            if (history.getStatus() == ReminderHistory.Status.SCHEDULED || history.getStatus() == ReminderHistory.Status.SNOOZED) {
+                scheduler.schedule(history, template);
+            } else {
+                // NẾU ĐÃ QUÁ GIỜ, ĐÃ UỐNG, ĐÃ HỦY -> XÓA BÁO THỨC KHỎI HỆ THỐNG ĐỂ TRÁNH KÊU OAN
+                scheduler.cancel(history.getId());
             }
         }
-        return filteredList;
     }
 
     @Override
-    public void addReminder(Reminder reminder) {
-        reminders.add(reminder);
+    public ReminderHistory getHistoryById(String id) {
+        return reminderDao.getHistoryById(id);
+    }
+
+    // ==========================================
+    // TRUY VẤN DỮ LIỆU GỘP CHO GIAO DIỆN
+    // ==========================================
+    @Override
+    public List<ReminderHistoryWithTemplate> getAllHistoryWithTemplates() {
+        return reminderDao.getAllHistoryWithTemplates();
     }
 
     @Override
-    public void updateReminder(Reminder reminder) {
-        // Tìm lịch nhắc cũ có cùng ID và ghi đè bằng lịch nhắc mới
-        for (int i = 0; i < reminders.size(); i++) {
-            if (reminders.get(i).getId().equals(reminder.getId())) {
-                reminders.set(i, reminder);
-                break;
-            }
-        }
-    }
-
-    @Override
-    public void deleteReminder(String id) {
-        reminders.removeIf(reminder -> reminder.getId().equals(id));
+    public List<ReminderHistoryWithTemplate> getHistoriesForTimeRange(long startTime, long endTime) {
+        return reminderDao.getHistoriesForTimeRange(startTime, endTime);
     }
 }

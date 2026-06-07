@@ -23,6 +23,12 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.trolyyte.MedicalAssistantApplication;
 import com.example.trolyyte.R;
+import com.example.trolyyte.domain.model.NlpResult;
+import com.example.trolyyte.domain.model.actions.AppointmentAction;
+import com.example.trolyyte.domain.model.actions.EmergencyAction;
+import com.example.trolyyte.domain.model.actions.MedicationAction;
+import com.example.trolyyte.presentation.appointment.AppointmentFormBottomSheet;
+import com.example.trolyyte.presentation.reminder.ReminderFormBottomSheet;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class HomeFragment extends Fragment {
@@ -56,8 +62,9 @@ public class HomeFragment extends Fragment {
 
         setupDependencies();
         setupViews(view);
-        setupWaveAnimation(); // Khởi tạo hiệu ứng sóng
+        setupWaveAnimation();
         observeUiState();
+        observeIntentActions();
     }
 
     private void setupDependencies() {
@@ -73,6 +80,30 @@ public class HomeFragment extends Fragment {
         waveBackground = view.findViewById(R.id.waveBackground);
 
         micButton.setOnClickListener(v -> checkPermissionAndStart());
+
+        // Nhấn giữ (Long click) -> Mở hộp thoại nhập Text dự phòng
+        micButton.setOnLongClickListener(v -> {
+            showTextInputDialog();
+            return true;
+        });
+    }
+
+    private void showTextInputDialog() {
+        android.widget.EditText input = new android.widget.EditText(requireContext());
+        input.setHint("Nhập câu lệnh (VD: Nhắc tôi uống thuốc...)");
+
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Chế độ Demo (Nhập Text)")
+                .setView(input)
+                .setPositiveButton("Gửi", (dialog, which) -> {
+                    String text = input.getText().toString().trim();
+                    if (!text.isEmpty()) {
+                        // Bắn thẳng Text vào ViewModel, bỏ qua Vosk
+                        viewModel.testTextDirectly(text);
+                    }
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
     }
 
     // TẠO HIỆU ỨNG SÓNG ÂM
@@ -148,5 +179,60 @@ public class HomeFragment extends Fragment {
         micButton.setBackgroundTintList(ColorStateList.valueOf(requireContext().getColor(R.color.green_speaking)));
         instructionText.setText(text); // Subtitle
         micButton.setEnabled(false);
+    }
+
+    private void observeIntentActions() {
+        viewModel.getActionLiveData().observe(getViewLifecycleOwner(), action -> {
+            if (action instanceof MedicationAction) {
+                NlpResult result = ((MedicationAction) action).getResult();
+                showMedicineForm(result.getEntities());
+
+            } else if (action instanceof AppointmentAction) {
+                NlpResult result = ((AppointmentAction) action).getResult();
+                showAppointmentForm(result.getEntities());
+
+            } else if (action instanceof EmergencyAction) {
+                executeEmergencyCall();
+            }
+        });
+    }
+
+    // BỔ SUNG HÀM HIỂN THỊ FORM THUỐC
+    private void showMedicineForm(java.util.Map<String, String> entities) {
+        ReminderFormBottomSheet bottomSheet = ReminderFormBottomSheet.newInstance(entities,
+                (title, dosage, instruction, triggerAt, type, repeat, minutes) -> {
+                    // TODO: Gọi ViewModel để lưu vào Room Database
+                    Toast.makeText(requireContext(), "Đã lưu thuốc: " + title, Toast.LENGTH_SHORT).show();
+                });
+        bottomSheet.show(getParentFragmentManager(), "MED_FORM");
+    }
+
+    // BỔ SUNG HÀM HIỂN THỊ FORM LỊCH KHÁM
+    private void showAppointmentForm(java.util.Map<String, String> entities) {
+        AppointmentFormBottomSheet bottomSheet = AppointmentFormBottomSheet.newInstance(entities,
+                (title, location, doctorName, notes, timeMillis) -> {
+                    // TODO: Gọi ViewModel để lưu vào Room Database
+                    Toast.makeText(requireContext(), "Đã lưu lịch khám: " + title, Toast.LENGTH_SHORT).show();
+                });
+        bottomSheet.show(getParentFragmentManager(), "APPT_FORM");
+    }
+
+    private void executeEmergencyCall() {
+        // Tương lai lấy từ UserProfile, nay gán cứng số điện thoại người thân để test (VD số của bác)
+        String emergencyPhone = "0987654321";
+
+        // 1. Kiểm tra xem app đã có quyền tự động gọi chưa
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+            // CÓ QUYỀN -> GỌI THẲNG KHÔNG CẦN CHẠM TAY
+            android.content.Intent callIntent = new android.content.Intent(android.content.Intent.ACTION_CALL);
+            callIntent.setData(android.net.Uri.parse("tel:" + emergencyPhone));
+            startActivity(callIntent);
+        } else {
+            // CHƯA CÓ QUYỀN -> Fallback về việc mở màn hình quay số (ACTION_DIAL) cho an toàn
+            Toast.makeText(requireContext(), "Bác chưa cấp quyền Gọi điện tự động!", Toast.LENGTH_LONG).show();
+            android.content.Intent dialIntent = new android.content.Intent(android.content.Intent.ACTION_DIAL);
+            dialIntent.setData(android.net.Uri.parse("tel:" + emergencyPhone));
+            startActivity(dialIntent);
+        }
     }
 }

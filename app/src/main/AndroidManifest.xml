@@ -1,19 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Bước 1: Quyền hạn cho Notification và Alarm -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+
     <application
-        android:extractNativeLibs="true"  android:allowBackup="true"
+        android:name=".MedicalAssistantApplication"
+        android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:extractNativeLibs="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.TroLyYTe"
-        android:name=".MedicalAssistantApplication">
+        android:theme="@style/Theme.TroLyYTe">
+
         <activity
             android:name=".presentation.main.MainActivity"
             android:exported="true">
@@ -25,6 +37,12 @@
 
         <activity
             android:name=".presentation.home.HomeActivity"
+            android:exported="false" />
+
+        <!-- Đăng ký Receiver -->
+        <receiver
+            android:name=".data.receiver.ReminderBroadcastReceiver"
+            android:enabled="true"
             android:exported="false" />
 
     </application>

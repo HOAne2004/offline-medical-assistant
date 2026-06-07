@@ -57,26 +57,60 @@ public class VoskAsrEngine implements AsrEngine, RecognitionListener {
         this.callback = callback;
 
         if (!isModelLoaded) {
-            if (!isInitializing) {
-                initialize(); // Nếu chưa chạy thì chạy init
-            }
-            // Báo lỗi nhẹ để UI hiển thị "Đang khởi động..." thay vì crash
+            if (!isInitializing) initialize();
             callback.onError(new Exception("Hệ thống đang khởi động, vui lòng đợi 2 giây..."));
             return;
         }
 
         try {
+            // Nâng cấp của ChatGPT: Giải phóng mic triệt để
             if (speechService != null) {
                 speechService.stop();
+                speechService.shutdown();
                 speechService = null;
             }
 
-            // Tạo Recognizer mới mỗi lần nghe để tránh lỗi state cũ
-            Recognizer recognizer = new Recognizer(model, 16000.0f);
-            speechService = new SpeechService(recognizer, 16000.0f);
-            speechService.startListening(this);
+            // 1. ÉP CỨNG SAMPLE RATE CHUẨN CỦA VOSK MODEL
+            float sampleRate = 16000.0f;
+            Log.d(TAG, "Recognizer chạy ở 16000Hz");
 
-            callback.onReady(); // Báo UI là đã bắt đầu nghe
+            /// =====================================================================
+            // BƯỚC TEST 2: NẾU VOSK QUÁ TỆ, BẬT CHẾ ĐỘ GRAMMAR LAI
+            // =====================================================================
+            String hybridGrammar = "[" +
+                    // 1. Nhóm Cụm từ cố định (Tăng tối đa độ chính xác cho Intent)
+                    "\"đặt lịch khám\", \"đặt lịch tái khám\", \"cho tôi đặt lịch\", \"tôi muốn đặt lịch\", " +
+                    "\"nhắc tôi uống thuốc\", \"đặt lịch uống thuốc\", \"nhắc tôi đi\", " +
+                    "\"gọi cấp cứu\", \"cứu tôi với\", \"tôi bị khó thở\", \"tôi bị đau ngực\", \"gọi cho người thân\", " +
+                    "\"có\", \"không\", \"hủy\", \"đồng ý\", " +
+
+                    // 2. Nhóm từ vựng - Hành động & Đại từ
+                    "\"nhắc\", \"tôi\", \"uống\", \"thuốc\", \"đặt\", \"lịch\", \"khám\", \"đi\", \"đo\", \"tập\", \"gọi\", \"muốn\", \"cho\", \"hẹn\", " +
+
+                    // 3. Nhóm từ vựng - Tên thuốc, Bệnh lý & Hoạt động (Phục vụ Entity Extraction)
+                    "\"huyết\", \"áp\", \"paracetamol\", \"vitamin\", \"c\", \"dạ\", \"dày\", \"tiểu\", \"đường\", \"cảm\", \"cúm\", \"bổ\", " +
+                    "\"thể\", \"dục\", \"bộ\", \"mắt\", \"răng\", \"tim\", \"mạch\", \"tai\", \"mũi\", \"họng\", \"tổng\", \"quát\", " +
+                    "\"sức\", \"khỏe\", \"bệnh\", \"viện\", \"bạch\", \"mai\", \"bác\", \"sĩ\", " +
+
+                    // 4. Nhóm từ vựng - Thời gian & Ngày tháng (Phục vụ Entity Extraction)
+                    "\"lúc\", \"vào\", \"giờ\", \"phút\", \"sáng\", \"trưa\", \"chiều\", \"tối\", \"nay\", \"ngày\", \"mai\", \"kia\", " +
+                    "\"tuần\", \"sau\", \"tới\", \"thứ\", \"hai\", \"ba\", \"tư\", \"năm\", \"sáu\", \"bảy\", \"chủ\", \"nhật\", " +
+                    "\"trước\", \"khi\", \"ăn\", \"bữa\", \"báo\", \"thức\", " +
+
+                    // 5. Nhóm từ vựng - Số đếm (Giờ giấc)
+                    "\"một\", \"hai\", \"ba\", \"bốn\", \"năm\", \"sáu\", \"bảy\", \"tám\", \"chín\", \"mười\", \"mười một\", \"mười hai\", " +
+
+                    // 6. Nhóm từ vựng - Bổ trợ
+                    "\"với\", \"quá\", \"đang\", \"bị\", \"đau\", \"ngay\", \"lập\", \"tức\", \"giúp\", \"dữ\", \"dội\", " +
+
+                    // 7. Fallback (Bắt buộc phải có)
+                    "\"[unk]\"]";
+
+            Recognizer recognizer = new Recognizer(model, sampleRate, hybridGrammar);
+
+            speechService = new SpeechService(recognizer, sampleRate);
+            speechService.startListening(this);
+            callback.onReady();
 
         } catch (IOException e) {
             callback.onError(e);

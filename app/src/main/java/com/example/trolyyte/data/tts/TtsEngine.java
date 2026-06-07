@@ -14,4 +14,8 @@ public interface TtsEngine {
     void stop();
 
     void shutdown();
+
+    void setSpeechRate(float speed);
 }
+
+

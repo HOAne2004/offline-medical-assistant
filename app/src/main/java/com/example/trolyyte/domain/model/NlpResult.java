@@ -16,7 +16,7 @@ public class NlpResult {
         this.confidence = confidence;
     }
 
-    public String getOriginalText() { return originalText; }
+    public String getText() { return originalText; }
     public NluIntent getIntent() { return intent; }
     public Map<String, String> getEntities() { return entities; }
     public float getConfidence() { return confidence; }

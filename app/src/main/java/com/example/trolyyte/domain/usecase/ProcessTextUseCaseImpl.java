@@ -1,7 +1,7 @@
 package com.example.trolyyte.domain.usecase;
 
-import com.example.trolyyte.domain.repository.NlpRepository;
 import com.example.trolyyte.domain.model.NlpResult;
+import com.example.trolyyte.domain.repository.NlpRepository;
 
 public class ProcessTextUseCaseImpl implements ProcessTextUseCase {
 
