@@ -10,7 +10,7 @@ public class AsrRepositoryImpl implements AsrRepository {
     public AsrRepositoryImpl(AsrEngine asrEngine) {
         this.asrEngine = asrEngine;
         // Tự động init model khi Repository được tạo (hoặc gọi lazy tuỳ bạn)
-        this.asrEngine.initialize();
+        //this.asrEngine.initialize();
     }
 
     @Override

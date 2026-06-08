@@ -1,5 +1,6 @@
 package com.example.trolyyte.data.wakeword;
 
+import android.app.PendingIntent;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -162,14 +163,39 @@ public class WakeWordService extends Service implements RecognitionListener {
         }
 
         openAppAndStartAssistant();
+
+        stopSelf();
     }
 
     private void openAppAndStartAssistant() {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent();
+        intent.setClassName(
+                getPackageName(),
+                "com.example.trolyyte.presentation.main.MainActivity"
+        );
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("WAKE_WORD_DETECTED", true);
-        startActivity(intent);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                this,
+                300,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("Trợ lý y tế")
+                .setContentText("Đã nghe “Bác sĩ ơi” - chạm để mở app")
+                .setSmallIcon(android.R.drawable.ic_btn_speak_now)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(Notification.DEFAULT_ALL)
+                .build();
+
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        manager.notify(999, notification);
     }
 
     private boolean isWakeWord(String rawText) {
@@ -181,22 +207,36 @@ public class WakeWordService extends Service implements RecognitionListener {
 
         Log.d(TAG, "Nghe được: " + rawText + " | Chuẩn hóa: " + text);
 
-        if (text.equals("bac si oi")) return true;
-        if (text.equals("bac sy oi")) return true;
-        if (text.equals("oi bac si")) return true;
-        if (text.equals("oi bac sy")) return true;
+        String[] wakeVariants = {
+                "bac si oi",
+                "bac sy oi",
+                "oi bac si",
+                "oi bac sy",
 
-        // Trường hợp VOSK nhận nhầm "Bác sĩ ơi" thành "bật cười"
-        if (text.equals("bat cuoi")) return true;
-        if (text.equals("bac cuoi")) return true;
-        if (text.equals("bat si oi")) return true;
-        if (text.equals("bac oi")) return true;
+                "bac si",
+                "bac sy",
 
-        // Trường hợp câu dài hơn, ví dụ: "xin chào bác sĩ ơi"
-        if (text.contains("bac si oi")) return true;
-        if (text.contains("bac sy oi")) return true;
-        if (text.contains("oi bac si")) return true;
-        if (text.contains("oi bac sy")) return true;
+                "bac si nguoi",
+                "bac sy nguoi",
+                "bac si ngoi",
+                "bac si vui",
+
+                "bat cuoi",
+                "bac cuoi",
+                "bat si oi",
+                "bac oi",
+
+                "mac du nguoi",
+                "moi nguoi",
+                "moc nguoi",
+                "mcp khi vui",
+                "mcp khi thoi"
+        };
+
+        for (String wake : wakeVariants) {
+            if (text.equals(wake)) return true;
+            if (text.contains(wake)) return true;
+        }
 
         return false;
     }
@@ -277,7 +317,7 @@ public class WakeWordService extends Service implements RecognitionListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-
+        Log.e(TAG, "WAKE SERVICE DESTROYED");
         try {
             if (speechService != null) {
                 speechService.stop();
@@ -304,8 +344,11 @@ public class WakeWordService extends Service implements RecognitionListener {
             NotificationChannel channel = new NotificationChannel(
                     CHANNEL_ID,
                     "Wake Word Service",
-                    NotificationManager.IMPORTANCE_LOW
+                    NotificationManager.IMPORTANCE_HIGH
             );
+
+            channel.setDescription("Thông báo khi phát hiện câu Bác sĩ ơi");
+            channel.enableVibration(true);
 
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel);

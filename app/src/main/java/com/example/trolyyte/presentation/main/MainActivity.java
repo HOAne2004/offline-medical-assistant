@@ -30,7 +30,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Nếu app được mở do nói "Bác sĩ ơi"
         if (getIntent() != null && getIntent().getBooleanExtra("WAKE_WORD_DETECTED", false)) {
-            startWakeWordService();
+            //startWakeWordService();
+            stopWakeWordService();
             navigateToHome();
             return;
         }
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == REQUEST_PERMISSIONS) {
-            startWakeWordService();
+
             startTimer();
         }
     }
@@ -116,6 +117,10 @@ public class MainActivity extends AppCompatActivity {
 
         startActivity(intent);
         finish();
+    }
+    private void stopWakeWordService() {
+        Intent intent = new Intent(this, WakeWordService.class);
+        stopService(intent);
     }
 
 }
