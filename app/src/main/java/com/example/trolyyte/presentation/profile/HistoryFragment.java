@@ -211,4 +211,10 @@ public class HistoryFragment extends Fragment implements ScheduleAdapter.Schedul
         binding = null;
         executorService.shutdown();
     }
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Mỗi lần mở lại tab Lịch sử, tự động quét lại DB để cập nhật tiến độ
+        loadHistoryData();
+    }
 }

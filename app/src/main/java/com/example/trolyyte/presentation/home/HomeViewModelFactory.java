@@ -4,15 +4,15 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.trolyyte.di.AppContainer; // NHỚ IMPORT CÁI NÀY
 import com.example.trolyyte.domain.repository.TtsRepository;
-import com.example.trolyyte.domain.usecase.HandleDialogueUseCase;
-import com.example.trolyyte.domain.usecase.ListenVoiceUseCase;
-import com.example.trolyyte.domain.usecase.ProcessTextUseCase;
-import com.example.trolyyte.domain.usecase.SpeakResponseUseCase;
+import com.example.trolyyte.domain.usecase.*;
 import com.example.trolyyte.presentation.common.ResponseTextProvider;
 
 public class HomeViewModelFactory implements ViewModelProvider.Factory {
 
+    // 1. Thêm biến AppContainer vào đây
+    private final AppContainer appContainer;
     private final ListenVoiceUseCase listenVoiceUseCase;
     private final ProcessTextUseCase processTextUseCase;
     private final HandleDialogueUseCase handleDialogueUseCase;
@@ -20,7 +20,9 @@ public class HomeViewModelFactory implements ViewModelProvider.Factory {
     private final TtsRepository ttsRepository;
     private final ResponseTextProvider responseTextProvider;
 
+    // 2. Thêm vào Constructor
     public HomeViewModelFactory(
+            AppContainer appContainer,
             ListenVoiceUseCase listenVoiceUseCase,
             ProcessTextUseCase processTextUseCase,
             HandleDialogueUseCase handleDialogueUseCase,
@@ -28,6 +30,7 @@ public class HomeViewModelFactory implements ViewModelProvider.Factory {
             TtsRepository ttsRepository,
             ResponseTextProvider responseTextProvider
     ) {
+        this.appContainer = appContainer;
         this.listenVoiceUseCase = listenVoiceUseCase;
         this.processTextUseCase = processTextUseCase;
         this.handleDialogueUseCase = handleDialogueUseCase;
@@ -40,8 +43,9 @@ public class HomeViewModelFactory implements ViewModelProvider.Factory {
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(HomeViewModel.class)) {
-            //noinspection unchecked
+            // 3. Truyền thêm appContainer vào hàm tạo mới
             return (T) new HomeViewModel(
+                    appContainer,
                     listenVoiceUseCase,
                     processTextUseCase,
                     handleDialogueUseCase,

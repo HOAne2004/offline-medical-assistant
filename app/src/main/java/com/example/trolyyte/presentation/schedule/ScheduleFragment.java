@@ -147,4 +147,12 @@ public class ScheduleFragment extends Fragment implements ScheduleAdapter.Schedu
         super.onDestroyView();
         binding = null;
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (viewModel != null) {
+            viewModel.loadSchedule();
+        }
+    }
 }

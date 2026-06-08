@@ -81,6 +81,19 @@ public class HomeFragment extends Fragment {
 
         micButton.setOnClickListener(v -> checkPermissionAndStart());
 
+        // THAY ĐỔI SỰ KIỆN CLICK MIC
+        micButton.setOnClickListener(v -> {
+            HomeUiState state = viewModel.getUiState().getValue();
+            // Nếu đang nghe -> Bấm phát nữa là Tắt ngay lập tức
+            if (state instanceof HomeUiState.Listening || state instanceof HomeUiState.PartialResult) {
+                viewModel.stopListening();
+                stopWaveAnimation();
+            } else {
+                // Nếu đang nghỉ -> Bật mic lên
+                checkPermissionAndStart();
+            }
+        });
+
         // Nhấn giữ (Long click) -> Mở hộp thoại nhập Text dự phòng
         micButton.setOnLongClickListener(v -> {
             showTextInputDialog();
@@ -197,21 +210,23 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    // BỔ SUNG HÀM HIỂN THỊ FORM THUỐC
+    // Trong HomeFragment.java
+
     private void showMedicineForm(java.util.Map<String, String> entities) {
         ReminderFormBottomSheet bottomSheet = ReminderFormBottomSheet.newInstance(entities,
                 (title, dosage, instruction, triggerAt, type, repeat, minutes) -> {
-                    // TODO: Gọi ViewModel để lưu vào Room Database
+                    // GỌI VIEWMODEL ĐỂ LƯU THẬT SỰ
+                    viewModel.saveMedicineReminder(title, dosage, instruction, triggerAt, type, repeat, minutes);
                     Toast.makeText(requireContext(), "Đã lưu thuốc: " + title, Toast.LENGTH_SHORT).show();
                 });
         bottomSheet.show(getParentFragmentManager(), "MED_FORM");
     }
 
-    // BỔ SUNG HÀM HIỂN THỊ FORM LỊCH KHÁM
     private void showAppointmentForm(java.util.Map<String, String> entities) {
         AppointmentFormBottomSheet bottomSheet = AppointmentFormBottomSheet.newInstance(entities,
                 (title, location, doctorName, notes, timeMillis) -> {
-                    // TODO: Gọi ViewModel để lưu vào Room Database
+                    // GỌI VIEWMODEL ĐỂ LƯU THẬT SỰ
+                    viewModel.saveAppointment(title, location, doctorName, notes, timeMillis);
                     Toast.makeText(requireContext(), "Đã lưu lịch khám: " + title, Toast.LENGTH_SHORT).show();
                 });
         bottomSheet.show(getParentFragmentManager(), "APPT_FORM");

@@ -103,15 +103,45 @@ public class TfliteNlpEngine implements NlpEngine {
         // BƯỚC 3: Log Top 3 Intent để dễ Debug
         logTop3Intents(nluText, output[0]);
 
-        // BƯỚC 4: Lấy Top 1 Intent
+// BƯỚC 4: Lấy Top 1 Intent
         int maxIndex = argMax(output[0]);
         float confidence = output[0][maxIndex];
+        String aiLabel = labelMap.getOrDefault(maxIndex, "FALLBACK");
 
-        String labelStr = "fallback";
-        if (confidence >= CONFIDENCE_THRESHOLD) {
-            labelStr = labelMap.getOrDefault(maxIndex, "fallback");
+        Log.d("NLU_TEST", "AI Confidence = " + confidence + " | AI Label = " + aiLabel);
+
+        // ======================================================
+        // ÁP DỤNG HYBRID RULE-BASED (Bản sửa lỗi)
+        // Lọc các từ khóa tử huyệt trước để cứu AI
+        // ======================================================
+        String labelStr = aiLabel; // Mặc định tin AI trước
+        String lower = nluText.toLowerCase();
+
+        // 1. RULE CẤP CỨU (Ưu tiên tuyệt đối)
+        if (lower.contains("cấp cứu") || lower.contains("khó thở") || lower.contains("đau ngực") || lower.contains("cứu tôi")) {
+            labelStr = "REQUEST_EMERGENCY";
         }
+        // 2. RULE ĐẶT LỊCH THUỐC (Chứa chữ nhắc + uống)
+        else if ((lower.contains("nhắc") || lower.contains("đặt lịch")) && (lower.contains("uống") || lower.contains("thuốc"))) {
+            labelStr = "SET_OR_UPDATE_MEDICATION";
+        }
+        // 3. RULE ĐẶT LỊCH KHÁM
+        else if (lower.contains("đặt lịch khám") || lower.contains("tái khám") || (lower.contains("khám") && lower.contains("bệnh viện"))) {
+            labelStr = "SET_OR_UPDATE_APPOINTMENT";
+        }
+        // 4. RULE TRA CỨU THUỐC (Nằm dưới để không đè lên nhắc thuốc)
+        else if (lower.contains("tác dụng") || lower.contains("liều dùng") || lower.contains("thuốc này")) {
+            labelStr = "INQUIRE_MEDICINE";
+        }
+        // 5. NẾU KHÔNG TRÚNG RULE NÀO -> KIỂM TRA ĐIỂM CỦA AI
+        else {
+            if (confidence < 0.60f) { // Nếu AI ko chắc chắn (< 60%)
+                labelStr = "FALLBACK";
+            }
+        }
+
         NluIntent intent = mapLabelToIntent(labelStr);
+        Log.d("NLU_TEST", "FINAL INTENT (Sau khi qua Rule) = " + intent.name());
 
         // BƯỚC 5: TRÍCH XUẤT THỰC THỂ (Entity Extraction bằng Rule-based)
         Map<String, String> entities = RuleBasedEntityExtractor.extract(nluText);

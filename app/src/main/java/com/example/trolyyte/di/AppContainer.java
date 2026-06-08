@@ -153,6 +153,6 @@ public class AppContainer {
         );
     }
     public HomeViewModelFactory getHomeViewModelFactory() {
-        return new HomeViewModelFactory(listenVoiceUseCase, processTextUseCase, handleDialogueUseCase, speakResponseUseCase, ttsRepository, responseTextProvider);
+        return new HomeViewModelFactory(this, listenVoiceUseCase, processTextUseCase, handleDialogueUseCase, speakResponseUseCase, ttsRepository, responseTextProvider);
     }
 }
