@@ -67,6 +67,14 @@ public class HomeFragment extends Fragment {
         observeIntentActions();
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (viewModel != null) {
+            viewModel.stopListening();
+        }
+    }
+
     private void setupDependencies() {
         MedicalAssistantApplication app = (MedicalAssistantApplication) requireActivity().getApplication();
         HomeViewModelFactory factory = app.appContainer.getHomeViewModelFactory();

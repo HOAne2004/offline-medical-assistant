@@ -7,7 +7,14 @@ import com.example.trolyyte.R;
 import com.example.trolyyte.presentation.profile.ProfileFragment;
 import com.example.trolyyte.presentation.schedule.ScheduleFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import android.content.Intent;
+import com.example.trolyyte.data.wakeword.WakeWordService;
+
 public class HomeActivity extends AppCompatActivity {
+
+    private void stopWakeWordService() {
+        stopService(new Intent(this, WakeWordService.class));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,5 +56,20 @@ public class HomeActivity extends AppCompatActivity {
                 .beginTransaction()
                 .replace(R.id.fragment_container, fragment)
                 .commit();
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        stopWakeWordService();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        Intent intent = new Intent(this, WakeWordService.class);
+
+        androidx.core.content.ContextCompat
+                .startForegroundService(this, intent);
     }
 }
